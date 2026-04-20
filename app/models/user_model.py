@@ -17,5 +17,6 @@ class User(EntidadBase):
             'nombre': self.nombre,
             'apellido': self.apellido,
             'correo': self.correo,
-            'rol': self.rol.to_dict() if self.rol else None
+            'rol': self.rol.to_dict() if self.rol else None,
+            "estado": self.estado   
         }
