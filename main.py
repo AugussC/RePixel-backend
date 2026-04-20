@@ -1,11 +1,12 @@
 from flask import Flask
 from flask_cors import CORS
-from app.routes.routes import api
+from app.routes.auth_routes import auth_routes
 
 app = Flask(__name__)
+app.secret_key = "drmerygraciasportodalainfo"
 CORS(app)  
 
-app.register_blueprint(api)
+app.register_blueprint(auth_routes)
 
 if __name__ == "__main__":
     app.run(debug=True)
