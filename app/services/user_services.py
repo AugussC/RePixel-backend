@@ -3,6 +3,7 @@ from app.models.user_model import User
 from app.database.connection import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
 from psycopg2.extras import RealDictCursor
+
  
 
 def create_user(nombre, apellido, correo, contraseña, id_rol):
@@ -201,7 +202,6 @@ def update_user(user_id, nombre=None, apellido=None, correo=None, contraseña=No
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-        # Construimos la consulta dinámicamente
         fields = []
         values = []
 
@@ -226,17 +226,26 @@ def update_user(user_id, nombre=None, apellido=None, correo=None, contraseña=No
             print("No se proporcionaron campos para actualizar.")
             return None
 
-        values.append(user_id)  # El ID va al final para el WHERE
+        values.append(user_id)
 
-        query = f"UPDATE Usuario SET {', '.join(fields)} WHERE id_usuario = %s RETURNING *"
+
+        query = f"UPDATE Usuario SET {', '.join(fields)} WHERE id_usuario = %s"
         cursor.execute(query, tuple(values))
+
+        cursor.execute("""
+            SELECT u.*, r.nombre_rol
+            FROM Usuario u
+            JOIN Rol r ON u.id_rol = r.id_rol
+            WHERE u.id_usuario = %s
+        """, (user_id,))
+
         updated_user_data = cursor.fetchone()
 
         if not updated_user_data:
-            print(f"Usuario con ID {user_id} no encontrado para actualización.")
             return None
 
         objeto_rol = Rol(updated_user_data['id_rol'], updated_user_data['nombre_rol'])
+
         updated_user = User(
             updated_user_data['id_usuario'], 
             updated_user_data['nombre'], 
@@ -245,7 +254,9 @@ def update_user(user_id, nombre=None, apellido=None, correo=None, contraseña=No
             updated_user_data['contrasena'], 
             objeto_rol
         )
-        
+
+        updated_user.estado = updated_user_data['estado']
+
         connection.commit()
         return updated_user
 
@@ -253,7 +264,7 @@ def update_user(user_id, nombre=None, apellido=None, correo=None, contraseña=No
         if connection: connection.rollback()
         print(f"Error en update_user: {e}")
         return None
-
+    
 def toggle_user_status(user_id):
     connection = get_connection()
     if connection is None: return None
@@ -265,16 +276,36 @@ def toggle_user_status(user_id):
             UPDATE Usuario
             SET estado = NOT estado
             WHERE id_usuario = %s
-            RETURNING *
         """, (user_id,))
 
-        updated_user_data = cursor.fetchone()
+        # 🔥 Ahora hacemos SELECT con JOIN (como los demás)
+        cursor.execute("""
+            SELECT u.*, r.nombre_rol
+            FROM Usuario u
+            JOIN Rol r ON u.id_rol = r.id_rol
+            WHERE u.id_usuario = %s
+        """, (user_id,))
 
-        if not updated_user_data:
+        user_data = cursor.fetchone()
+
+        if not user_data:
             return None
 
+        objeto_rol = Rol(user_data['id_rol'], user_data['nombre_rol'])
+
+        user = User(
+            user_data['id_usuario'], 
+            user_data['nombre'], 
+            user_data['apellido'], 
+            user_data['correo'], 
+            user_data['contrasena'], 
+            objeto_rol
+        )
+
+        user.estado = user_data['estado']
+
         connection.commit()
-        return updated_user_data
+        return user
 
     except Exception as e:
         if connection: connection.rollback()
