@@ -1,6 +1,4 @@
 from flask import Blueprint, jsonify, request
-
-from app.database.connection import DatabaseConnection, get_connection
 from app.services.user_services import get_all_users, update_user,get_user_by_id,toggle_user_status, get_user_by_email
 
 user_routes = Blueprint("user_routes", __name__)
