@@ -1,24 +1,22 @@
 import cv2
 import os
 from datetime import datetime, timedelta
-
-from flask import jsonify
 from app.database.connection import get_connection
 from app.models.image_model import Image
 from app.models.user_model import User
+from app.models.rol_model import Rol
+from app.services.user_services import get_user_by_id
 from psycopg2.extras import RealDictCursor
 
 
-def upload_image(filepath):
+def upload_image(filepath, current_user, id_tipoimagen=1):
     connection = get_connection()
-    if connection is None:
-        return None
+    if connection is None: return None
 
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
         img = cv2.imread(filepath)
-
         if img is None:
             print("No se pudo leer la imagen")
             return None
@@ -28,19 +26,20 @@ def upload_image(filepath):
         fecha = datetime.now()
         fecha_expiracion = fecha + timedelta(hours=12)
         
+        # Usamos el ID del usuario real que pasamos por parámetro
+        user_id = current_user.id
+        
         cursor.execute("""
             INSERT INTO Imagen (altura, ancho, fecha_subida, fecha_expiracion, peso_subida, id_tipoimagen, id_usuario, ruta)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING *
-        """, (altura, ancho, fecha, fecha_expiracion, peso, 1, 1, filepath))
+        """, (altura, ancho, fecha, fecha_expiracion, peso, id_tipoimagen, user_id, filepath))
 
         data = cursor.fetchone()
         connection.commit()
 
-        usuario = User(1, "dummy", "dummy", "dummy@mail.com", "", None)
-
-
-        image = Image(
+        # Retornamos la imagen vinculada al objeto usuario real
+        return Image(
             data['id_imagen'],
             data['altura'],
             data['ancho'],
@@ -49,63 +48,58 @@ def upload_image(filepath):
             data['peso_subida'],
             data['ruta'],              
             data['id_tipoimagen'],
-            usuario
+            current_user
         )
 
-        return image
-
     except Exception as e:
-        if connection:
-            connection.rollback()
+        if connection: connection.rollback()
         print(f"Error en upload_image: {e}")
         return None
-
+    
 
 def get_image_by_id(image_id):
     connection = get_connection()
-    if connection is None:
-        return None
+    if connection is None: return None
 
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-        cursor.execute("""
-            SELECT * FROM Imagen WHERE id_imagen = %s
-        """, (image_id,))
-
+        # Hacemos JOIN con Usuario y Rol para tener el objeto completo
+        query = """
+            SELECT i.*, u.nombre, u.apellido, u.correo, u.contrasena, u.id_rol, r.nombre_rol
+            FROM Imagen i
+            JOIN Usuario u ON i.id_usuario = u.id_usuario
+            JOIN Rol r ON u.id_rol = r.id_rol
+            WHERE i.id_imagen = %s
+        """
+        cursor.execute(query, (image_id,))
         data = cursor.fetchone()
 
-        if not data:
-            return None
+        if not data: return None
 
-        usuario = User(1, "dummy", "dummy", "dummy@mail.com", "", None)
+        # Reconstruimos la jerarquía de objetos
+        objeto_rol = Rol(data['id_rol'], data['nombre_rol'])
+        usuario = User(data['id_usuario'], data['nombre'], data['apellido'], data['correo'], data['contrasena'], objeto_rol)
 
-        image = Image(
-            data['id_imagen'],
-            data['altura'],
-            data['ancho'],
-            data['fecha_subida'],
-            data['fecha_expiracion'],
-            data['peso_subida'],
-            data['ruta'],              
-            data['id_tipoimagen'],
-            usuario
+        return Image(
+            data['id_imagen'], data['altura'], data['ancho'],
+            data['fecha_subida'], data['fecha_expiracion'], data['peso_subida'],
+            data['ruta'], data['id_tipoimagen'], usuario
         )
-
-        return image
 
     except Exception as e:
         print(f"Error en get_image_by_id: {e}")
         return None
-    
-def get_images_by_user_service(user_id):
 
+def get_images_by_user_service(user_id):
     connection = get_connection()
-    if connection is None:
-        return []
+    if connection is None: return []
 
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
+        
+        
+        usuario_obj = get_user_by_id(user_id)
 
         cursor.execute("""
             SELECT * FROM imagen
@@ -113,29 +107,17 @@ def get_images_by_user_service(user_id):
         """, (user_id,))
 
         rows = cursor.fetchall()
-
         images = []
 
         for data in rows:
-
-            usuario = User(user_id, "dummy", "dummy", "dummy@mail.com", "", None)
-
             image = Image(
-                data['id_imagen'],
-                data['altura'],
-                data['ancho'],
-                data['fecha_subida'],
-                data['fecha_expiracion'],
-                data['peso_subida'],
-                data['ruta'],
-                data['id_tipoimagen'],
-                usuario
+                data['id_imagen'], data['altura'], data['ancho'],
+                data['fecha_subida'], data['fecha_expiracion'], data['peso_subida'],
+                data['ruta'], data['id_tipoimagen'], usuario_obj
             )
-
             images.append(image)
 
         return images
-
     except Exception as e:
         print("Error get_images_by_user:", e)
         return []

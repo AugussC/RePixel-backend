@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request, send_file
+from flask import Blueprint, jsonify, request, send_file, session
 from werkzeug.utils import secure_filename
 import os
 
 from app.services.image_services import upload_image, get_image_by_id, get_images_by_user_service, disable_image_service
+from app.services.user_services import get_user_by_id
 
 image_routes = Blueprint("image_routes", __name__)
 
@@ -17,30 +18,26 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 
 @image_routes.route("/images", methods=["POST"])
-def upload_image_route():
+def upload():
+    
+    user_id = session.get('user_id') 
+    if not user_id:
+        return jsonify({"error": "No autorizado"}), 401
 
-    if 'file' not in request.files:
-        return jsonify({"error": "No se envió archivo"}), 400
-
+   
+    current_user = get_user_by_id(user_id)
+    
+    
     file = request.files['file']
-
-    if file.filename == '':
-        return jsonify({"error": "Nombre vacío"}), 400
-
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-
-
+    filepath = os.path.join('uploads', file.filename)
     file.save(filepath)
 
-    print("GUARDADO EN:", filepath)  #
-
-    image = upload_image(filepath)
-
-    if not image:
-        return jsonify({"error": "Error al procesar imagen"}), 500
-
-    return jsonify(image.to_dict()), 201
+   
+    image = upload_image(filepath, current_user)
+    
+    if image:
+         return jsonify({"message": "OK", "id": image.id}), 201
+    return jsonify({"error": "Error"}), 500
 
 @image_routes.route("/images/<id>/view", methods=["GET"])
 def view_image(id):
