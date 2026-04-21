@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, session
 # from app.services.auth_services import login_user, register_user
-from app.services.user_services import create_user, login_user
+from app.services.user_services import create_user, get_user_by_id, login_user
 
 auth_routes = Blueprint("auth_routes", __name__)
 
@@ -49,3 +49,16 @@ def register():
 def logout():
     session.clear() # Borra toda la información de la sesión
     return jsonify({"message": "Sesión cerrada exitosamente"}), 200
+
+@auth_routes.route('/me', methods=['GET'])
+def get_me():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify(None), 200
+    user = get_user_by_id(user_id)
+    return jsonify({
+        "id": user.id,
+        "nombre": user.nombre,
+        "apellido": user.apellido,
+        "correo": user.correo
+    })
