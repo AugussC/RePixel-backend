@@ -32,13 +32,11 @@ def upload():
     
     file = request.files['file']
 
-    # Validar nombre
     if file.filename == "":
         return jsonify({"error": "Nombre de archivo inválido"}), 400
 
     filename = file.filename.lower()
 
-    # 🔹 Validar extensión + mapear tipo
     tipos = {
         "png": 1,
         "jpg": 2,
@@ -51,8 +49,6 @@ def upload():
         return jsonify({"error": "La imagen debe tener formato (JPG/PNG/JPEG)"}), 400
 
     id_tipoimagen = tipos[ext]
-
-    # 🔹 Validar tamaño REAL
     file.seek(0, os.SEEK_END)
     size = file.tell()
     file.seek(0)
@@ -60,7 +56,6 @@ def upload():
     if size > 5 * 1024 * 1024:
         return jsonify({"error": "Su imagen supera el límite de tamaño de 5MB"}), 400
 
-    # 🔹 Guardar archivo
     filepath = os.path.join('uploads', file.filename)
     file.save(filepath)
 

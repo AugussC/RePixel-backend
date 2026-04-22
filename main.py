@@ -8,7 +8,6 @@ from scheduler import start_scheduler
 app = Flask(__name__)
 app.secret_key = "drmerygraciasportodalainfo"
 
-# --- CONFIGURACIÓN CRÍTICA DE CORS ---
 CORS(app, supports_credentials=True, origins=[
     "http://127.0.0.1:5500", 
     "http://localhost:5500",
@@ -18,7 +17,7 @@ CORS(app, supports_credentials=True, origins=[
 
 app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',
-    SESSION_COOKIE_SECURE=False, # Cambiar a True solo si usas HTTPS
+    SESSION_COOKIE_SECURE=False, 
     SESSION_COOKIE_HTTPONLY=True
 )
 

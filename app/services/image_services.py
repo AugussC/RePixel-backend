@@ -25,8 +25,7 @@ def upload_image(filepath, current_user, id_tipoimagen):
         peso = os.path.getsize(filepath)
         fecha = datetime.now()
         fecha_expiracion = fecha + timedelta(hours=12)
-        
-        # Usamos el ID del usuario real que pasamos por parámetro
+
         user_id = current_user.id
         
         cursor.execute("""
@@ -38,7 +37,6 @@ def upload_image(filepath, current_user, id_tipoimagen):
         data = cursor.fetchone()
         connection.commit()
 
-        # Retornamos la imagen vinculada al objeto usuario real
         return Image(
             data['id_imagen'],
             data['altura'],
@@ -64,7 +62,6 @@ def get_image_by_id(image_id):
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-        # Hacemos JOIN con Usuario y Rol para tener el objeto completo
         query = """
             SELECT i.*, u.nombre, u.apellido, u.correo, u.contrasena, u.id_rol, r.nombre_rol
             FROM Imagen i
@@ -77,7 +74,6 @@ def get_image_by_id(image_id):
 
         if not data: return None
 
-        # Reconstruimos la jerarquía de objetos
         objeto_rol = Rol(data['id_rol'], data['nombre_rol'])
         usuario = User(data['id_usuario'], data['nombre'], data['apellido'], data['correo'], data['contrasena'], objeto_rol)
 
@@ -96,8 +92,7 @@ def get_images_by_user_service(user_id):
     if connection is None: return []
 
     try:
-        cursor = connection.cursor(cursor_factory=RealDictCursor)
-        
+        cursor = connection.cursor(cursor_factory=RealDictCursor)  
         
         usuario_obj = get_user_by_id(user_id)
 
