@@ -16,7 +16,6 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 
-
 @image_routes.route("/images", methods=["POST"])
 def upload():
     
@@ -27,17 +26,49 @@ def upload():
    
     current_user = get_user_by_id(user_id)
     
+    if 'file' not in request.files:
+        return jsonify({"error": "No se envió ningún archivo"}), 400
+
     
     file = request.files['file']
+
+    # Validar nombre
+    if file.filename == "":
+        return jsonify({"error": "Nombre de archivo inválido"}), 400
+
+    filename = file.filename.lower()
+
+    # 🔹 Validar extensión + mapear tipo
+    tipos = {
+        "png": 1,
+        "jpg": 2,
+        "jpeg": 3
+    }
+
+    ext = filename.split('.')[-1]
+
+    if ext not in tipos:
+        return jsonify({"error": "La imagen debe tener formato (JPG/PNG/JPEG)"}), 400
+
+    id_tipoimagen = tipos[ext]
+
+    # 🔹 Validar tamaño REAL
+    file.seek(0, os.SEEK_END)
+    size = file.tell()
+    file.seek(0)
+
+    if size > 5 * 1024 * 1024:
+        return jsonify({"error": "Su imagen supera el límite de tamaño de 5MB"}), 400
+
+    # 🔹 Guardar archivo
     filepath = os.path.join('uploads', file.filename)
     file.save(filepath)
 
-   
-    image = upload_image(filepath, current_user)
+    image = upload_image(filepath, current_user, id_tipoimagen)
     
     if image:
          return jsonify({"message": "OK", "id": image.id}), 201
-    return jsonify({"error": "Error"}), 500
+    return jsonify({"error": "Ocurrió un error al intentar subir la imagen"}), 500
 
 @image_routes.route("/images/<id>/view", methods=["GET"])
 def view_image(id):

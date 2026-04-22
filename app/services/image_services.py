@@ -9,7 +9,7 @@ from app.services.user_services import get_user_by_id
 from psycopg2.extras import RealDictCursor
 
 
-def upload_image(filepath, current_user, id_tipoimagen=1):
+def upload_image(filepath, current_user, id_tipoimagen):
     connection = get_connection()
     if connection is None: return None
 
