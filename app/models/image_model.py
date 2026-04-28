@@ -17,14 +17,14 @@ class Image(EntidadBase):
 
     def to_dict(self):
         return {
-            "id_image": self.id,
-            "altura": self.altura,
-            "ancho": self.ancho,
-            "fecha_subida": self.fecha_subida,
-            "peso_subida": self.peso_subida,
-            "ruta": self.ruta,
-            "fecha_expiracion": self.fecha_expiracion,
-            "id_tipoImagen": self.id_tipoImagen,
-            "usuario": self.usuario.to_dict() if self.usuario else None,
-            "estado": self.estado
+            'id_image': self.id,
+            'altura': self.altura,
+            'ancho': self.ancho,
+            'fecha_subida': self.fecha_subida,
+            'peso_subida': self.peso_subida,
+            'ruta': self.ruta,
+            'fecha_expiracion': self.fecha_expiracion,
+            'id_tipoImagen': self.id_tipoImagen,
+            'usuario': self.usuario.to_dict() if self.usuario else None,
+            'estado': self.estado
         }

@@ -3,7 +3,7 @@ from flask_cors import CORS
 from app.routes.user_routes import user_routes
 from app.routes.auth_routes import auth_routes
 from app.routes.image_routes import image_routes
-from scheduler import start_scheduler
+from scheduler import iniciar_scheduler
 
 app = Flask(__name__)
 app.secret_key = "drmerygraciasportodalainfo"
@@ -21,7 +21,7 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True
 )
 
-start_scheduler()
+iniciar_scheduler()
 
 app.register_blueprint(auth_routes)
 app.register_blueprint(user_routes)

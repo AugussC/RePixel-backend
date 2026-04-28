@@ -1,26 +1,36 @@
 import cv2
 import os
-from datetime import datetime, timedelta
-from app.database.connection import get_connection
+from datetime import datetime
 from app.models.image_model import Image
 from app.models.user_model import User
 from app.models.rol_model import Rol
-from app.services.user_services import get_user_by_id
-from psycopg2.extras import RealDictCursor
+from app.services.user_services import obtener_usuario_por_id
+from app.utils.image_utils import obtener_metadata_imagen
+from app.utils.date_utils import obtener_fechas_expiracion
+from app.database.repositories.image_repository import desactivar_imagen_db, desactivar_imagen_db, insertar_imagen, obtener_imagen_por_id_db, obtener_imagenes_por_usuario_db
+from app.models.image_model import Image
 
 
-def upload_image(filepath, current_user, id_tipoimagen):
-    connection = get_connection()
-    if connection is None: return None
+def subir_imagen(filepath, current_user, id_tipoimagen):
+    metadata = obtener_metadata_imagen(filepath)
+    if metadata is None:
+        return None
 
-    try:
-        cursor = connection.cursor(cursor_factory=RealDictCursor)
+    altura, ancho, peso = metadata
+    fecha, fecha_expiracion = obtener_fechas_expiracion()
 
-        img = cv2.imread(filepath)
-        if img is None:
-            print("No se pudo leer la imagen")
-            return None
+    data = (
+        altura,
+        ancho,
+        fecha,
+        fecha_expiracion,
+        peso,
+        id_tipoimagen,
+        current_user.id,
+        filepath
+    )
 
+<<<<<<< Updated upstream
         altura, ancho = img.shape[:2]
         peso = os.path.getsize(filepath)
         fecha = datetime.now()
@@ -33,28 +43,82 @@ def upload_image(filepath, current_user, id_tipoimagen):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING *
         """, (altura, ancho, fecha, fecha_expiracion, peso, id_tipoimagen, user_id, filepath))
+=======
+    result = insertar_imagen(data)
+>>>>>>> Stashed changes
 
-        data = cursor.fetchone()
-        connection.commit()
+    return Image(
+        result['id_imagen'],
+        result['altura'],
+        result['ancho'],
+        result['fecha_subida'],
+        result['fecha_expiracion'],
+        result['peso_subida'],
+        result['ruta'],
+        result['id_tipoimagen'],
+        current_user
+    )
+    
 
+<<<<<<< Updated upstream
         return Image(
+=======
+def obtener_imagen_por_id(image_id):
+    data = obtener_imagen_por_id_db(image_id)
+    if not data:
+        return None
+
+    rol = Rol(data['id_rol'], data['nombre_rol'])
+
+    usuario = User(
+        data['id_usuario'],
+        data['nombre'],
+        data['apellido'],
+        data['correo'],
+        data['contrasena'],
+        rol
+    )
+
+    return Image(
+        data['id_imagen'],
+        data['altura'],
+        data['ancho'],
+        data['fecha_subida'],
+        data['fecha_expiracion'],
+        data['peso_subida'],
+        data['ruta'],
+        data['id_tipoimagen'],
+        usuario
+    )
+
+def obtener_imagenes_por_usuario(user_id):
+
+    usuario_obj = obtener_usuario_por_id(user_id)
+
+    rows = obtener_imagenes_por_usuario_db(user_id)
+
+    images = []
+
+    for data in rows:
+        image = Image(
+>>>>>>> Stashed changes
             data['id_imagen'],
             data['altura'],
             data['ancho'],
             data['fecha_subida'],
             data['fecha_expiracion'],
             data['peso_subida'],
-            data['ruta'],              
+            data['ruta'],
             data['id_tipoimagen'],
-            current_user
+            usuario_obj
         )
+        images.append(image)
 
-    except Exception as e:
-        if connection: connection.rollback()
-        print(f"Error en upload_image: {e}")
-        return None
+    return images
     
+def desactivar_imagen(image_id):
 
+<<<<<<< Updated upstream
 def get_image_by_id(image_id):
     connection = get_connection()
     if connection is None: return None
@@ -132,3 +196,7 @@ def disable_image_service(image_id):
     except Exception as e:
         print("Error disable_image:", e)
         return False
+=======
+    fecha_expiracion = datetime.now()
+    return desactivar_imagen_db(image_id, fecha_expiracion)
+>>>>>>> Stashed changes

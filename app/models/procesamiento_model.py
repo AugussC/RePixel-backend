@@ -11,9 +11,9 @@ class Procesamiento(EntidadBase):
         
     def to_dict(self):
         return {
-            "id_procesamiento": self.id,
-            "estado": self.estado,
-            "fecha_procesamiento": self.fecha_procesamiento,
-            "Imagen": self.Imagen.to_dict() if self.Imagen else None
+            'id_procesamiento': self.id,
+            'estado': self.estado,
+            'fecha_procesamiento': self.fecha_procesamiento,
+            'Imagen': self.Imagen.to_dict() if self.Imagen else None
         }
         

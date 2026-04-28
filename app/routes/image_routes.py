@@ -2,8 +2,8 @@ from flask import Blueprint, jsonify, request, send_file, session
 from werkzeug.utils import secure_filename
 import os
 
-from app.services.image_services import upload_image, get_image_by_id, get_images_by_user_service, disable_image_service
-from app.services.user_services import get_user_by_id
+from app.services.image_services import subir_imagen, obtener_imagen_por_id, obtener_imagenes_por_usuario, desactivar_imagen
+from app.services.user_services import obtener_usuario_por_id
 
 image_routes = Blueprint("image_routes", __name__)
 
@@ -17,14 +17,14 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 
 @image_routes.route("/images", methods=["POST"])
-def upload():
+def subir():
     
     user_id = session.get('user_id') 
     if not user_id:
         return jsonify({"error": "No autorizado"}), 401
 
    
-    current_user = get_user_by_id(user_id)
+    current_user = obtener_usuario_por_id(user_id)
     
     if 'file' not in request.files:
         return jsonify({"error": "No se envió ningún archivo"}), 400
@@ -59,7 +59,7 @@ def upload():
     filepath = os.path.join('uploads', file.filename)
     file.save(filepath)
 
-    image = upload_image(filepath, current_user, id_tipoimagen)
+    image = subir_imagen(filepath, current_user, id_tipoimagen)
     
     if image:
          return jsonify({"message": "OK", "id": image.id}), 201
@@ -68,7 +68,7 @@ def upload():
 @image_routes.route("/images/<id>/view", methods=["GET"])
 def view_image(id):
 
-    image = get_image_by_id(int(id))
+    image = obtener_imagen_por_id(int(id))
 
     if not image:
         return jsonify({"error": "Imagen no disponible"}), 404
@@ -80,7 +80,7 @@ def view_image(id):
 @image_routes.route("/images/<id>", methods=["GET"])
 def get_image(id):
 
-    image = get_image_by_id(id)
+    image = obtener_imagen_por_id(int(id))
 
     if not image:
         return jsonify({"error": "No encontrada"}), 404
@@ -90,7 +90,7 @@ def get_image(id):
 @image_routes.route("/users/<id_usuario>/images", methods=["GET"])
 def get_images_by_user(id_usuario):
 
-    images = get_images_by_user_service(int(id_usuario))
+    images = obtener_imagenes_por_usuario(int(id_usuario))
 
     if not images:
         return jsonify([]), 200
@@ -100,7 +100,7 @@ def get_images_by_user(id_usuario):
 @image_routes.route("/images/<id>/disable", methods=["PATCH"])
 def disable_image(id):
 
-    success = disable_image_service(int(id))
+    success = desactivar_imagen(int(id))
 
     if not success:
         return jsonify({"error": "No se pudo desactivar"}), 400

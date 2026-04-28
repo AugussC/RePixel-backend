@@ -6,6 +6,6 @@ class TipoImagen(EntidadBase):
 
     def to_dict(self):
         return {
-            "id_tipo_imagen": self.id,
-            "nombreTipoImagen": self.nombreTipoImagen
+            'id_tipo_imagen': self.id,
+            'nombreTipoImagen': self.nombreTipoImagen
         }

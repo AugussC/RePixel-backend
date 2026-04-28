@@ -1,19 +1,17 @@
 from flask import Blueprint, jsonify, request, session
-# from app.services.auth_services import login_user, register_user
-from app.services.user_services import create_user, get_user_by_id, login_user
+from app.services.user_services import crear_usuario, obtener_usuario_por_id,iniciar_sesion_usuario
 
 auth_routes = Blueprint("auth_routes", __name__)
 
 @auth_routes.route("/login", methods=["POST"]) # Endpoint para iniciar sesión
-def login():
+def iniciar_sesion():
     data = request.get_json()
     correo = data.get("correo")
     password = data.get("contraseña")
 
-    user = login_user(correo, password)
+    user = iniciar_sesion_usuario(correo, password)
 
     if user:
-        # GUARDAMOS EN LA SESIÓN
         session.clear() # Limpiamos cualquier sesión previa
         session["user_id"] = user.id
         session["user_nombre"] = user.nombre
@@ -23,7 +21,7 @@ def login():
     return jsonify({"error": "Credenciales inválidas"}), 401
     
 @auth_routes.route("/register", methods=["POST"]) # Endpoint para registrar un nuevo usuario
-def register():
+def registrar():
     # Obtener los datos del usuario desde la solicitud
     data = request.get_json()
     nombre = data.get("nombre")
@@ -37,7 +35,7 @@ def register():
         return jsonify({"error": "Todos los campos son obligatorios"}), 400
     
 
-    user = create_user(nombre, apellido, correo, contraseña, id_rol)
+    user = crear_usuario(nombre, apellido, correo, contraseña, id_rol)
 
     # 5. Respuesta
     if user:
@@ -46,16 +44,16 @@ def register():
         return jsonify({"error": "Error al registrar el usuario"}), 500
 
 @auth_routes.route("/logout", methods=["POST"]) # Endpoint para cerrar sesión
-def logout():
+def deslogear():
     session.clear() # Borra toda la información de la sesión
     return jsonify({"message": "Sesión cerrada exitosamente"}), 200
 
 @auth_routes.route('/me', methods=['GET'])
-def get_me():
+def obtener_usuario_actual():
     user_id = session.get('user_id')
     if not user_id:
         return jsonify(None), 200
-    user = get_user_by_id(user_id)
+    user = obtener_usuario_por_id(user_id)
     return jsonify({
         "id": user.id,
         "nombre": user.nombre,

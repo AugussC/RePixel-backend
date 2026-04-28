@@ -29,13 +29,8 @@ def desactivar_imagenes_expiradas():
             except:
                 pass
 
-def start_scheduler():
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(desactivar_imagenes_expiradas, "interval", minutes=1)
-    scheduler.start()
 
-
-def start_scheduler():
+def iniciar_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         desactivar_imagenes_expiradas,
