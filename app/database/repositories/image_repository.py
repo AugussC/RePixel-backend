@@ -23,7 +23,7 @@ def obtener_imagen_por_id_db(image_id):
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
         query = """
-            SELECT i.*, u.nombre, u.apellido, u.correo, u.contrasena, u.id_rol, r.nombre_rol
+            SELECT i.*, u.nombre, u.apellido, u.correo, u.contraseña, u.id_rol, r.nombre_rol
             FROM Imagen i
             JOIN Usuario u ON i.id_usuario = u.id_usuario
             JOIN Rol r ON u.id_rol = r.id_rol

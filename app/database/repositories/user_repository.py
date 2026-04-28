@@ -5,7 +5,17 @@ def obtener_usuario_por_correo_db(correo):
     connection = abrir_conexion()
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("SELECT id_usuario FROM Usuario WHERE correo = %s", (correo,))
+        cursor.execute("""
+            SELECT 
+                id_usuario,
+                nombre,
+                apellido,
+                correo,
+                contraseña,
+                id_rol
+            FROM Usuario
+            WHERE correo = %s AND estado = TRUE
+        """, (correo,))
         return cursor.fetchone()
     except Exception as e:
         connection.rollback()
@@ -49,7 +59,7 @@ def insertar_usuario_db(nombre, apellido, correo, password_hash, id_rol):
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute("""
-            INSERT INTO Usuario (nombre, apellido, correo, contrasena, id_rol)
+            INSERT INTO Usuario (nombre, apellido, correo, contraseña, id_rol)
             VALUES (%s, %s, %s, %s, %s)
             RETURNING id_usuario
         """, (nombre, apellido, correo, password_hash, id_rol))

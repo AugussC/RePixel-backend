@@ -1,14 +1,11 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.database.connection import get_connection
-
-from apscheduler.schedulers.background import BackgroundScheduler
-from app.database.connection import get_connection
+from app.database.connection import abrir_conexion
 from datetime import datetime
 
 def desactivar_imagenes_expiradas():
     try:
         # 🔹 Cada ejecución crea su propia conexión
-        connection = get_connection()
+        connection = abrir_conexion()
         cursor = connection.cursor()
         
         cursor.execute("""

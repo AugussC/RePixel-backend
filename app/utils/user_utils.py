@@ -21,7 +21,7 @@ def construir_campos_actualizacion(nombre, apellido, correo, contraseña, id_rol
         values.append(correo)
 
     if contraseña:
-        fields.append("contrasena = %s")
+        fields.append("contraseña = %s")
         values.append(hash_password(contraseña))
 
     if id_rol:

@@ -31,7 +31,6 @@ def iniciar_sesion():
         }), 400
 
     except Exception:
-
         return jsonify({
             "error": "Error interno del servidor"
         }), 500
@@ -81,7 +80,7 @@ def deslogear():
     }), 200
 
 @auth_routes.route('/me', methods=['GET'])
-def obtener_usuario_actual():
+def obtener_me():
     user_id = session.get('user_id')
 
     if not user_id:

@@ -45,11 +45,10 @@ def crear_usuario(nombre, apellido, correo, contraseña, id_rol):
 def iniciar_sesion_usuario(correo, password_plana):
 
     user_data = obtener_usuario_por_correo_db(correo)
-
     if not user_data:
         return None
 
-    if not verify_password(user_data['contrasena'], password_plana):
+    if not verify_password(user_data['contraseña'], password_plana):
         return None
 
     rol_data = obtener_rol_por_id_db(user_data['id_rol'])
@@ -64,7 +63,7 @@ def iniciar_sesion_usuario(correo, password_plana):
         user_data['nombre'],
         user_data['apellido'],
         user_data['correo'],
-        user_data['contrasena'],
+        user_data['contraseña'],
         rol
     )
 
@@ -84,23 +83,21 @@ def obtener_todos_los_usuarios():
             user_data['nombre'],
             user_data['apellido'],
             user_data['correo'],
-            user_data['contrasena'],
-            rol
+            user_data['contraseña'],
+            rol,
         )
-
+        user.estado = user_data['estado']
         users.append(user)
 
     return users
     
 def obtener_usuario_por_id(user_id):
 
-    # 1. Traer datos
     user_data = obtener_usuario_por_id_db(user_id)
 
     if not user_data:
         return None
 
-    # 2. Mapear
     rol = Rol(user_data['id_rol'], user_data['nombre_rol'])
 
     user = User(
@@ -108,9 +105,10 @@ def obtener_usuario_por_id(user_id):
         user_data['nombre'],
         user_data['apellido'],
         user_data['correo'],
-        user_data['contrasena'],
+        user_data['contraseña'],
         rol
     )
+    user.estado = user_data['estado']
 
     return user
 
@@ -120,18 +118,21 @@ def obtener_usuario_por_email(correo):
 
     if not user_data:
         return None
-
-    rol = Rol(user_data['id_rol'], user_data['nombre_rol'])
+    
+    rol_data = obtener_rol_por_id_db(user_data['id_rol'])
+    if not rol_data:
+        return None
+    
+    rol = Rol(rol_data['id_rol'], rol_data['nombre_rol'])
 
     user = User(
         user_data['id_usuario'],
         user_data['nombre'],
         user_data['apellido'],
         user_data['correo'],
-        user_data['contrasena'],
+        user_data['contraseña'],
         rol
     )
-
     return user
 
 def actualizar_usuario(user_id, nombre=None, apellido=None, correo=None, contraseña=None, id_rol=None):
@@ -155,7 +156,7 @@ def actualizar_usuario(user_id, nombre=None, apellido=None, correo=None, contras
         updated_user_data['nombre'],
         updated_user_data['apellido'],
         updated_user_data['correo'],
-        updated_user_data['contrasena'],
+        updated_user_data['contraseña'],
         rol
     )
 
@@ -179,7 +180,7 @@ def cambio_estado(user_id):
         user_data['nombre'],
         user_data['apellido'],
         user_data['correo'],
-        user_data['contrasena'],
+        user_data['contraseña'],
         rol
     )
 
