@@ -1,59 +1,94 @@
 from flask import Blueprint, jsonify, request, session
-from app.services.user_services import crear_usuario, obtener_usuario_por_id,iniciar_sesion_usuario
+from app.services.auth_services import login_usuario, registrar_usuario, obtener_usuario_actual
+from app.utils.user_utils import crear_sesion_usuario, cerrar_sesion
+from app.utils.user_validators import validar_login_data, validar_register_data
 
 auth_routes = Blueprint("auth_routes", __name__)
 
 @auth_routes.route("/login", methods=["POST"]) # Endpoint para iniciar sesión
 def iniciar_sesion():
-    data = request.get_json()
-    correo = data.get("correo")
-    password = data.get("contraseña")
-
-    user = iniciar_sesion_usuario(correo, password)
-
-    if user:
-        session.clear() # Limpiamos cualquier sesión previa
-        session["user_id"] = user.id
-        session["user_nombre"] = user.nombre
-        
-        return jsonify({"message": "Login exitoso", "user": user.to_dict()}), 200
+    try:
+        data = request.get_json()
+        correo, password = validar_login_data(data)
     
-    return jsonify({"error": "Credenciales inválidas"}), 401
+        user = login_usuario(correo, password) 
+        if not user:
+            return jsonify({
+                "error": "Credenciales inválidas"
+            }), 401
+
+        crear_sesion_usuario(user) 
+
+        return jsonify({
+            "message": "Login exitoso",
+            "user": user.to_dict()
+        }), 200
+
+    except ValueError as e:
+
+        return jsonify({
+            "error": str(e)
+        }), 400
+
+    except Exception:
+
+        return jsonify({
+            "error": "Error interno del servidor"
+        }), 500
+
     
 @auth_routes.route("/register", methods=["POST"]) # Endpoint para registrar un nuevo usuario
 def registrar():
-    # Obtener los datos del usuario desde la solicitud
-    data = request.get_json()
-    nombre = data.get("nombre")
-    apellido = data.get("apellido")
-    correo = data.get("correo")
-    contraseña = data.get("contraseña")
-    id_rol = data.get("rol")
+    try:
+        data = request.get_json()
+        nombre, apellido, correo, contraseña, id_rol = validar_register_data(data)
 
+        user = registrar_usuario(
+            nombre,
+            apellido,
+            correo,
+            contraseña,
+            id_rol
+        )
 
-    if not all([nombre, apellido, correo, contraseña, id_rol]): # Verificar que todos los campos sean proporcionados
-        return jsonify({"error": "Todos los campos son obligatorios"}), 400
-    
+        if not user:
+            return jsonify({
+                "error": "Error al registrar el usuario"
+            }), 500
 
-    user = crear_usuario(nombre, apellido, correo, contraseña, id_rol)
-
-    # 5. Respuesta
-    if user:
         return jsonify(user.to_dict()), 201
-    else:
-        return jsonify({"error": "Error al registrar el usuario"}), 500
+
+    except ValueError as e:
+
+        return jsonify({
+            "error": str(e)
+        }), 400
+
+    except Exception:
+
+        return jsonify({
+            "error": "Error interno del servidor"
+        }), 500
+
 
 @auth_routes.route("/logout", methods=["POST"]) # Endpoint para cerrar sesión
 def deslogear():
-    session.clear() # Borra toda la información de la sesión
-    return jsonify({"message": "Sesión cerrada exitosamente"}), 200
+
+    cerrar_sesion()
+
+    return jsonify({
+        "message": "Sesión cerrada exitosamente"
+    }), 200
 
 @auth_routes.route('/me', methods=['GET'])
 def obtener_usuario_actual():
     user_id = session.get('user_id')
+
     if not user_id:
         return jsonify(None), 200
-    user = obtener_usuario_por_id(user_id)
+
+    user = obtener_usuario_actual(user_id)
+
     return jsonify({
         "id": user.id,
         "nombre": user.nombre,

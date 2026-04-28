@@ -12,3 +12,12 @@ def obtener_metadata_imagen(filepath):
     peso = os.path.getsize(filepath)
 
     return altura, ancho, peso
+
+
+def guardar_archivo(file):
+
+    filepath = os.path.join('uploads', file.filename)
+
+    file.save(filepath)
+
+    return filepath

@@ -4,6 +4,9 @@ import os
 
 from app.services.image_services import subir_imagen, obtener_imagen_por_id, obtener_imagenes_por_usuario, desactivar_imagen
 from app.services.user_services import obtener_usuario_por_id
+from app.utils.image_utils import guardar_archivo
+from app.utils.imagen_validators import validar_archivo_en_request, validar_extension_archivo, validar_nombre_archivo, validar_tamano_archivo
+from app.utils.user_validators import validar_usuario_autenticado
 
 image_routes = Blueprint("image_routes", __name__)
 
@@ -18,53 +21,45 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 @image_routes.route("/images", methods=["POST"])
 def subir():
-    
-    user_id = session.get('user_id') 
-    if not user_id:
-        return jsonify({"error": "No autorizado"}), 401
+    try:
 
-   
-    current_user = obtener_usuario_por_id(user_id)
-    
-    if 'file' not in request.files:
-        return jsonify({"error": "No se envió ningún archivo"}), 400
+        # 1. Usuario autenticado
+        user_id = validar_usuario_autenticado()
+        current_user = obtener_usuario_por_id(user_id)
 
-    
-    file = request.files['file']
 
-    if file.filename == "":
-        return jsonify({"error": "Nombre de archivo inválido"}), 400
+        # 2. Validaciones archivo
+        file = validar_archivo_en_request(request.files)
 
-    filename = file.filename.lower()
+        validar_nombre_archivo(file)
 
-    tipos = {
-        "png": 1,
-        "jpg": 2,
-        "jpeg": 3
-    }
+        id_tipoimagen = validar_extension_archivo(file.filename)
 
-    ext = filename.split('.')[-1]
+        validar_tamano_archivo(file)
 
-    if ext not in tipos:
-        return jsonify({"error": "La imagen debe tener formato (JPG/PNG/JPEG)"}), 400
+        # 3. Guardar archivo
+        filepath = guardar_archivo(file)
 
-    id_tipoimagen = tipos[ext]
-    file.seek(0, os.SEEK_END)
-    size = file.tell()
-    file.seek(0)
+        # 4. Subir imagen
+        image = subir_imagen(filepath, current_user, id_tipoimagen)
 
-    if size > 5 * 1024 * 1024:
-        return jsonify({"error": "Su imagen supera el límite de tamaño de 5MB"}), 400
+        return jsonify({
+            "message": "OK",
+            "id": image.id
+        }), 201
 
-    filepath = os.path.join('uploads', file.filename)
-    file.save(filepath)
+    except ValueError as e:
 
-    image = subir_imagen(filepath, current_user, id_tipoimagen)
-    
-    if image:
-         return jsonify({"message": "OK", "id": image.id}), 201
-    return jsonify({"error": "Ocurrió un error al intentar subir la imagen"}), 500
+        return jsonify({
+            "error": str(e)
+        }), 400
 
+    except Exception:
+
+        return jsonify({
+            "error": "Ocurrió un error al intentar subir la imagen"
+        }), 500
+        
 @image_routes.route("/images/<id>/view", methods=["GET"])
 def view_image(id):
 
