@@ -1,7 +1,5 @@
 from flask import Blueprint, jsonify, request, send_file, session
-from werkzeug.utils import secure_filename
 import os
-
 from app.services.image_services import subir_imagen, obtener_imagen_por_id, obtener_imagenes_por_usuario, desactivar_imagen
 from app.services.user_services import obtener_usuario_por_id
 from app.utils.image_utils import guardar_archivo
@@ -9,7 +7,6 @@ from app.utils.imagen_validators import validar_archivo_en_request, validar_exte
 from app.utils.user_validators import validar_usuario_autenticado
 
 image_routes = Blueprint("image_routes", __name__)
-
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.abspath(os.path.join(BASE_DIR, "../../uploads"))
@@ -23,12 +20,9 @@ if not os.path.exists(UPLOAD_FOLDER):
 def subir():
     try:
 
-        # 1. Usuario autenticado
         user_id = validar_usuario_autenticado()
         current_user = obtener_usuario_por_id(user_id)
 
-
-        # 2. Validaciones archivo
         file = validar_archivo_en_request(request.files)
 
         validar_nombre_archivo(file)
@@ -37,27 +31,23 @@ def subir():
 
         validar_tamano_archivo(file)
 
-        # 3. Guardar archivo
         filepath = guardar_archivo(file)
 
-        # 4. Subir imagen
         image = subir_imagen(filepath, current_user, id_tipoimagen)
 
         return jsonify({
             "message": "OK",
             "id": image.id
-        }), 201
+        }), 200
 
     except ValueError as e:
-
         return jsonify({
             "error": str(e)
         }), 400
 
-    except Exception:
-
+    except Exception as e:
         return jsonify({
-            "error": "Ocurrió un error al intentar subir la imagen"
+            "error": str(e)
         }), 500
         
 @image_routes.route("/images/<id>/view", methods=["GET"])

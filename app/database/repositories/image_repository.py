@@ -1,4 +1,4 @@
-# app/repositories/image_repository.py
+
 
 from app.database.connection import abrir_conexion
 from psycopg2.extras import RealDictCursor
@@ -6,15 +6,33 @@ from psycopg2.extras import RealDictCursor
 def insertar_imagen(data):
     connection = abrir_conexion()
     try:
-        cursor = connection.cursor()
-        cursor.execute("INSERT ... RETURNING *", data)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+        query = """
+            INSERT INTO imagen (
+                altura,
+                ancho,
+                fecha_subida,
+                fecha_expiracion,
+                peso_subida,
+                id_tipoimagen,
+                id_usuario,
+                ruta,
+                estado
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, true)
+            RETURNING *
+        """
+
+        cursor.execute(query, data)
         result = cursor.fetchone()
+
         connection.commit()
         return result
 
     except Exception as e:
         connection.rollback()
-        raise e 
+        raise e
     
 def obtener_imagen_por_id_db(image_id):
     connection = abrir_conexion()
