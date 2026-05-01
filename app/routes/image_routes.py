@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, send_file, session
 import os
 from app.services.image_services import subir_imagen, obtener_imagen_por_id, obtener_imagenes_por_usuario, desactivar_imagen
 from app.services.user_services import obtener_usuario_por_id
-from app.utils.image_utils import guardar_archivo
+from app.utils.image_utils import guardar_archivo, validar_imagen
 from app.utils.imagen_validators import validar_archivo_en_request, validar_extension_archivo, validar_nombre_archivo, validar_tamano_archivo
 from app.utils.user_validators import validar_usuario_autenticado
 
@@ -20,20 +20,13 @@ if not os.path.exists(UPLOAD_FOLDER):
 def subir():
     try:
 
-        user_id = validar_usuario_autenticado()
-        current_user = obtener_usuario_por_id(user_id)
+        user_id = session.get("user_id")
 
-        file = validar_archivo_en_request(request.files)
-
-        validar_nombre_archivo(file)
-
-        id_tipoimagen = validar_extension_archivo(file.filename)
-
-        validar_tamano_archivo(file)
+        file, id_tipoimagen = validar_imagen(request.files) 
 
         filepath = guardar_archivo(file)
 
-        image = subir_imagen(filepath, current_user, id_tipoimagen)
+        image = subir_imagen(filepath, user_id, id_tipoimagen)
 
         return jsonify({
             "message": "OK",

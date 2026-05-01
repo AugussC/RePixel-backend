@@ -11,14 +11,13 @@ from app.database.repositories.image_repository import desactivar_imagen_db, des
 from app.models.image_model import Image
 
 
-def subir_imagen(filepath, current_user, id_tipoimagen):
+def subir_imagen(filepath, user_id, id_tipoimagen):
     metadata = obtener_metadata_imagen(filepath)
     if metadata is None:
         return None
 
-    altura, ancho, peso = metadata
-    fecha, fecha_expiracion = obtener_fechas_expiracion()
-
+    fecha, fecha_expiracion, altura, ancho, peso = metadata
+    
     data = (
         altura,
         ancho,
@@ -26,7 +25,7 @@ def subir_imagen(filepath, current_user, id_tipoimagen):
         fecha_expiracion,
         peso,
         id_tipoimagen,
-        current_user.id,
+        user_id,
         filepath
     )
 
@@ -41,7 +40,7 @@ def subir_imagen(filepath, current_user, id_tipoimagen):
         result['peso_subida'],
         result['ruta'],
         result['id_tipoimagen'],
-        current_user
+        user_id
     )
     
 
