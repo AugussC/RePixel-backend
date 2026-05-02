@@ -6,7 +6,6 @@ from app.models.user_model import User
 from app.models.rol_model import Rol
 from app.services.user_services import obtener_usuario_por_id
 from app.utils.image_utils import obtener_metadata_imagen
-from app.utils.date_utils import obtener_fechas_expiracion
 from app.database.repositories.image_repository import desactivar_imagen_db, desactivar_imagen_db, insertar_imagen, obtener_imagen_por_id_db, obtener_imagenes_por_usuario_db
 from app.models.image_model import Image
 
