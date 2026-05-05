@@ -1,10 +1,8 @@
 from flask import Blueprint, jsonify, request, send_file, session
 import os
 from app.services.image_services import subir_imagen, obtener_imagen_por_id, obtener_imagenes_por_usuario, desactivar_imagen
-from app.services.user_services import obtener_usuario_por_id
+from app.database.repositories.image_repository import obtener_tipo_imagen_disponible
 from app.utils.image_utils import guardar_archivo, validar_imagen
-from app.utils.imagen_validators import validar_archivo_en_request, validar_extension_archivo, validar_nombre_archivo, validar_tamano_archivo
-from app.utils.user_validators import validar_usuario_autenticado
 
 image_routes = Blueprint("image_routes", __name__)
 
@@ -84,3 +82,8 @@ def disable_image(id):
         return jsonify({"error": "No se pudo desactivar"}), 400
 
     return jsonify({"message": "Imagen desactivada"}), 200
+
+@image_routes.route('/images/tipos-imagen', methods=['GET'])
+def obtener_tipos_imagen():
+    tipos = obtener_tipo_imagen_disponible()
+    return jsonify(tipos), 200

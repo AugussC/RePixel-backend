@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import cv2
 import os
 
+from app.utils.date_utils import obtener_fechas_expiracion
 from app.utils.imagen_validators import validar_archivo_en_request, validar_extension_archivo, validar_nombre_archivo, validar_tamano_archivo
 
 def obtener_metadata_imagen(filepath):
@@ -14,8 +15,7 @@ def obtener_metadata_imagen(filepath):
     
     altura, ancho = img.shape[:2]
     peso = os.path.getsize(filepath)
-    fecha = datetime.now()
-    expiracion = fecha + timedelta(hours= 12)
+    fecha, expiracion = obtener_fechas_expiracion()
     return fecha, expiracion, altura, ancho, peso
     
 
@@ -35,3 +35,4 @@ def validar_imagen(file_storage):
     validar_tamano_archivo(file)
             
     return file, id_tipoimagen
+
