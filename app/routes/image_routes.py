@@ -1,8 +1,11 @@
 from flask import Blueprint, jsonify, request, send_file, session
 import os
+from app.database.repositories.procesamiento_repository import obtener_procesamiento_por_id
+from app.database.repositories.procesamiento_repository import obtener_procesamiento_por_id
 from app.services.image_services import subir_imagen, obtener_imagen_por_id, obtener_imagenes_por_usuario, desactivar_imagen
 from app.database.repositories.image_repository import obtener_tipo_imagen_disponible
 from app.utils.image_utils import guardar_archivo, validar_imagen
+from app.services.procesarImage_services import procesar_imagen_service
 
 image_routes = Blueprint("image_routes", __name__)
 
@@ -87,3 +90,28 @@ def disable_image(id):
 def obtener_tipos_imagen():
     tipos = obtener_tipo_imagen_disponible()
     return jsonify(tipos), 200
+
+@image_routes.route('/images/procesar-imagen/<id>', methods=['POST'])
+def procesar_imagen(id):
+    data = request.get_json()
+
+    algoritmo = data.get("algoritmo")
+
+    resultado = procesar_imagen_service(
+        id_imagen=id,
+        algoritmo=algoritmo
+    )
+
+    return jsonify(resultado), 200
+
+@image_routes.route("/images/procesamientos/<id>/view",methods=["GET"])
+def ver_procesamiento(id):
+
+    procesamiento = obtener_procesamiento_por_id(id)
+
+    if not procesamiento:
+        return jsonify({
+            "error": "No encontrado"
+        }), 404
+
+    return send_file(procesamiento["ruta_resultado"])
