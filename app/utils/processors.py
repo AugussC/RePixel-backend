@@ -58,3 +58,32 @@ class MejorarResolucionProcessor:
         )
 
         return ruta_salida
+    
+class EnfocarProcessor:
+
+    def procesar(self, ruta):
+
+        img = cv2.imread(ruta)
+
+        blur = cv2.GaussianBlur(
+            img,
+            (9, 9),
+            2
+        )
+
+        resultado = cv2.addWeighted(
+            img,
+            1.5,
+            blur,
+            -0.5,
+            0
+        )
+
+        ruta_salida = "uploads/enfocada_result.jpg"
+
+        cv2.imwrite(
+            ruta_salida,
+            resultado
+        )
+
+        return ruta_salida

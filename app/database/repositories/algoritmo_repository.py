@@ -6,7 +6,8 @@ from app.utils.processors import MejorarResolucionProcessor
 def obtener_procesador(nombre):
 
     procesadores = {
-        "mejorar resolucion": MejorarResolucionProcessor()
+        "mejorar resolucion": MejorarResolucionProcessor(),
+        "enfocar": EnfocarProcessor()
     }
 
     return procesadores.get(nombre)
