@@ -1,4 +1,4 @@
-"""
+
 # processors/sharpen_processor.py
 
 import cv2
@@ -52,13 +52,10 @@ class MejorarResolucionProcessor:
 
         ruta_salida = "uploads/mejorar_resolucion_result.jpg"
 
-        cv2.imwrite(
-            ruta_salida,
-            resultado
-        )
+        cv2.imwrite(ruta_salida,resultado)
 
         return ruta_salida
-    
+"""
 class EnfocarProcessor:
 
     def procesar(self, ruta):
@@ -81,9 +78,6 @@ class EnfocarProcessor:
 
         ruta_salida = "uploads/enfocada_result.jpg"
 
-        cv2.imwrite(
-            ruta_salida,
-            resultado
-        )
+        cv2.imwrite(ruta_salida,resultado)
 
         return ruta_salida

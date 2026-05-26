@@ -1,7 +1,7 @@
 from app.database.connection import abrir_conexion
 from psycopg2.extras import RealDictCursor
 
-from app.utils.processors import MejorarResolucionProcessor
+from app.utils.processors import MejorarResolucionProcessor, EnfocarProcessor
 
 def obtener_procesador(nombre):
 
