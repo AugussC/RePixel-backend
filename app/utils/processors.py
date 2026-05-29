@@ -81,3 +81,30 @@ class EnfocarProcessor:
         cv2.imwrite(ruta_salida,resultado)
 
         return ruta_salida
+    
+class BlancoNegroProcessor:
+
+    def procesar(self, ruta):
+
+        img = cv2.imread(ruta)
+
+        if img is None:
+            raise Exception(
+                "No se pudo leer la imagen"
+            )
+
+        resultado = cv2.cvtColor(
+            img,
+            cv2.COLOR_BGR2GRAY
+        )
+
+        ruta_salida = (
+            "uploads/blanco_negro.jpg"
+        )
+
+        cv2.imwrite(
+            ruta_salida,
+            resultado
+        )
+
+        return ruta_salida

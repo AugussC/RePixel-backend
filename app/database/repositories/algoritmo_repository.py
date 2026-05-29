@@ -1,13 +1,14 @@
 from app.database.connection import abrir_conexion
 from psycopg2.extras import RealDictCursor
 
-from app.utils.processors import MejorarResolucionProcessor, EnfocarProcessor
+from app.utils.processors import MejorarResolucionProcessor, EnfocarProcessor, BlancoNegroProcessor
 
 def obtener_procesador(nombre):
 
     procesadores = {
         "mejorar resolucion": MejorarResolucionProcessor(),
-        "enfocar": EnfocarProcessor()
+        "enfocar": EnfocarProcessor(),
+        "blanco y negro": BlancoNegroProcessor()
     }
 
     return procesadores.get(nombre)
