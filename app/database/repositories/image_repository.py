@@ -18,9 +18,10 @@ def insertar_imagen(data):
                 id_tipoimagen,
                 id_usuario,
                 ruta,
-                estado
+                estado,
+                nombre_archivo
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, true)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, true, %s)
             RETURNING *
         """
 

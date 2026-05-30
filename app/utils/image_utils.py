@@ -1,7 +1,4 @@
 # app/utils/image_utils.py
-
-from datetime import datetime, timedelta
-
 import cv2
 import os
 
@@ -13,10 +10,12 @@ def obtener_metadata_imagen(filepath):
     if img is None: 
         return None
     
+    
+    nombre_archivo=os.path.basename(filepath)
     altura, ancho = img.shape[:2]
     peso = os.path.getsize(filepath)
     fecha, expiracion = obtener_fechas_expiracion()
-    return fecha, expiracion, altura, ancho, peso
+    return fecha, expiracion, altura, ancho, peso, nombre_archivo
     
 
 

@@ -1,4 +1,4 @@
-from app.utils.processors import MejorarResolucionProcessor
+
 from app.database.repositories.procesamiento_repository import (
     crear_procesamiento,
     actualizar_procesamiento
@@ -47,6 +47,7 @@ def procesar_imagen_service(id_imagen, algoritmo):
         )
 
         return {
+            "id_procesamiento": procesamiento["id_procesamiento"],
             "mensaje": "Procesamiento exitoso",
             "ruta_resultado": ruta_resultado
         }
