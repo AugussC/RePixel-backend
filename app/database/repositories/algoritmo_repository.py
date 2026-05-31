@@ -9,8 +9,7 @@ def obtener_procesador(nombre):
         "restaurar imagen": RestaurarImagenProcessor(),
         "enfocar": EnfocarProcessor(),
         "blanco y negro": BlancoNegroProcessor(),
-        "quitar ruido": QuitarRuidoProcessor()
-        ,
+        "quitar ruido": QuitarRuidoProcessor(),
         "ajustar brillo": AjustarBrilloProcessor()
     }
 
