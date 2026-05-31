@@ -15,7 +15,7 @@ def subir_imagen(filepath, user_id, id_tipoimagen):
     if metadata is None:
         return None
 
-    fecha, fecha_expiracion, altura, ancho, peso = metadata
+    fecha, fecha_expiracion, altura, ancho, peso, nombre_archivo = metadata
     
     data = (
         altura,
@@ -25,7 +25,8 @@ def subir_imagen(filepath, user_id, id_tipoimagen):
         peso,
         id_tipoimagen,
         user_id,
-        filepath
+        filepath,
+        nombre_archivo
     )
 
     result = insertar_imagen(data)
@@ -39,7 +40,8 @@ def subir_imagen(filepath, user_id, id_tipoimagen):
         result['peso_subida'],
         result['ruta'],
         result['id_tipoimagen'],
-        user_id
+        user_id,
+        result['nombre_archivo']
     )
     
 
@@ -68,7 +70,8 @@ def obtener_imagen_por_id(image_id):
         data['peso_subida'],
         data['ruta'],
         data['id_tipoimagen'],
-        usuario
+        usuario,
+        data['nombre_archivo']
     )
 
 def obtener_imagenes_por_usuario(user_id):
@@ -89,7 +92,8 @@ def obtener_imagenes_por_usuario(user_id):
             data['peso_subida'],
             data['ruta'],
             data['id_tipoimagen'],
-            usuario_obj
+            usuario_obj,
+            data['nombre_archivo']
         )
         images.append(image)
 

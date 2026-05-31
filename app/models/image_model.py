@@ -4,7 +4,7 @@ from app.models.entidadBase import EntidadBase
 
 class Image(EntidadBase):
 
-    def __init__(self, id_image, altura, ancho, fecha_creacion,fecha_expiracion, peso_subida, ruta, id_tipoImagen, usuario):
+    def __init__(self, id_image, altura, ancho, fecha_creacion,fecha_expiracion, peso_subida, ruta, id_tipoImagen, usuario, nombre_archivo):
         super().__init__(id_image)
         self.altura = altura
         self.ancho = ancho
@@ -14,6 +14,7 @@ class Image(EntidadBase):
         self.ruta = ruta
         self.id_tipoImagen = id_tipoImagen
         self.usuario = usuario
+        self.nombre_archivo = nombre_archivo
 
     def to_dict(self):
         return {
@@ -26,5 +27,6 @@ class Image(EntidadBase):
             'fecha_expiracion': self.fecha_expiracion,
             'id_tipoImagen': self.id_tipoImagen,
             'usuario': self.usuario.to_dict() if self.usuario else None,
-            'estado': self.estado
+            'estado': self.estado,
+            'nombre_archivo': self.nombre_archivo
         }
