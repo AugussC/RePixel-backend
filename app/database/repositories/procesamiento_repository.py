@@ -68,36 +68,28 @@ def obtener_procesamiento_por_id(id_procesamiento):
         raise e
     
 def actualizar_procesamiento(id_procesamiento, estado=None, ruta_resultado=None):
-
     connection = abrir_conexion()
-
     try:
-
-        cursor = connection.cursor(
-            cursor_factory=RealDictCursor
-        )
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
 
         fields = []
         values = []
 
         if estado:
-
-            fields.append(
-                "estado = %s"
-            )
-
+            fields.append("estado = %s")
             values.append(estado)
 
         if ruta_resultado:
-
-            fields.append(
-                "ruta_resultado = %s"
-            )
-
+            fields.append("ruta_resultado = %s")
             values.append(ruta_resultado)
 
+        if not fields:
+            return None
+
+        # Agregamos el ID al final de los valores para el WHERE
         values.append(id_procesamiento)
 
+        # El WHERE ya no lleva un %s hardcodeado extra si mapeamos correctamente
         query = f"""
             UPDATE Procesamiento
             SET {', '.join(fields)}
@@ -105,21 +97,13 @@ def actualizar_procesamiento(id_procesamiento, estado=None, ruta_resultado=None)
             RETURNING *
         """
 
-        cursor.execute(
-            query,
-            tuple(values)
-        )
-
+        cursor.execute(query, tuple(values))
         result = cursor.fetchone()
-
         connection.commit()
-
         return result
 
     except Exception as e:
-
         connection.rollback()
-
         raise e
     
 def obtener_procesamientos_por_imagen(id_imagen):

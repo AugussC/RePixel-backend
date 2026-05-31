@@ -116,7 +116,7 @@ def procesar_imagen(id):
 def ver_procesamiento(id):
 
     procesamiento = obtener_procesamiento_por_id(id)
-
+    
     if not procesamiento:
         return jsonify({
             "error": "No encontrado"
