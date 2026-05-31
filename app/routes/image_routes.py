@@ -44,13 +44,21 @@ def subir():
             "error": str(e)
         }), 500
         
-@image_routes.route("/images/<id>/view", methods=["GET"])
+@image_routes.route("/images/<id>/view")
 def view_image(id):
 
     image = obtener_imagen_por_id(int(id))
 
+    print(image)
+
     if not image:
-        return jsonify({"error": "Imagen no disponible"}), 404
+        return jsonify({
+            "error": "Imagen no disponible"
+        }), 404
+
+    print("Ruta:", image.ruta)
+    print("Ruta BD:", image.ruta)
+    print("Existe:", os.path.exists(image.ruta))
 
     return send_file(image.ruta)
 

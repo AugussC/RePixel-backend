@@ -288,7 +288,7 @@ class RestaurarImagenProcessor:
 
         canales=[]
 
-        for i in range(3):
+        for i in range(3):  
 
             canal = self.richardson_lucy(
                 img[:,:,i],
