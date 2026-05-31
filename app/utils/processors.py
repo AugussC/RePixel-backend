@@ -108,3 +108,31 @@ class BlancoNegroProcessor:
         )
 
         return ruta_salida
+
+
+class AjustarBrilloProcessor:
+
+    def __init__(self, brillo=30):
+        self.brillo = brillo
+
+    def procesar(self, ruta):
+
+        img = cv2.imread(ruta)
+
+        if img is None:
+            raise Exception("No se pudo leer la imagen")
+
+        resultado = cv2.convertScaleAbs(
+            img,
+            alpha=1.0,
+            beta=self.brillo
+        )
+
+        ruta_salida = "uploads/ajustar_brillo_result.jpg"
+
+        cv2.imwrite(
+            ruta_salida,
+            resultado
+        )
+
+        return ruta_salida
