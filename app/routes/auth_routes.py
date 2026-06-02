@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, session
 from app.services.auth_services import login_usuario, registrar_usuario, obtener_usuario_actual
 from app.utils.user_utils import crear_sesion_usuario, cerrar_sesion
 from app.utils.user_validators import validar_login_data, validar_register_data
+from app.database.repositories.user_repository import obtener_usuario_por_correo_db
 
 auth_routes = Blueprint("auth_routes", __name__)
 
@@ -14,7 +15,7 @@ def iniciar_sesion():
         user = login_usuario(correo, password) 
         if not user:
             return jsonify({
-                "error": "Credenciales inválidas"
+                "error": "Correo o contraseña incorrectos"
             }), 401
 
         crear_sesion_usuario(user) 
@@ -41,6 +42,11 @@ def registrar():
     try:
         data = request.get_json()
         nombre, apellido, correo, contraseña, id_rol = validar_register_data(data)
+
+        if obtener_usuario_por_correo_db(correo):
+            return jsonify({
+                "error": "ya existe una cuenta con este correo"
+            }), 400
 
         user = registrar_usuario(
             nombre,
