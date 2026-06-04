@@ -160,7 +160,9 @@ class RestaurarImagenProcessor:
             
         return kernel
 
-    def richardson_lucy_regularizado(self, img, kernel, iteraciones=20, tikhonov_alpha=0.0005):
+    def richardson_lucy_regularizado(self, img, kernel):
+        tikhonov_alpha=0.0005, 
+        iteraciones=20,
         img = img.astype(np.float32) / 255.0
         estimacion = img.copy()
         kernel_flip = cv2.flip(kernel, -1)

@@ -42,13 +42,13 @@ def crear_usuario(nombre, apellido, correo, contraseña, id_rol):
     )
     
     
-def iniciar_sesion_usuario(correo, password_plana):
+def iniciar_sesion_usuario(correo, contraseña_plana):
 
     user_data = obtener_usuario_por_correo_db(correo)
     if not user_data:
         return None
 
-    if not verify_password(user_data['contraseña'], password_plana):
+    if not verify_password(user_data['contraseña'], contraseña_plana):
         return None
 
     rol_data = obtener_rol_por_id_db(user_data['id_rol'])
