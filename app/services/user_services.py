@@ -91,9 +91,9 @@ def obtener_todos_los_usuarios():
 
     return users
     
-def obtener_usuario_por_id(user_id):
+def obtener_usuario_por_id(id_usuario):
 
-    user_data = obtener_usuario_por_id_db(user_id)
+    user_data = obtener_usuario_por_id_db(id_usuario)
 
     if not user_data:
         return None
@@ -135,7 +135,7 @@ def obtener_usuario_por_email(correo):
     )
     return user
 
-def actualizar_usuario(user_id, nombre=None, apellido=None, correo=None, contraseña=None, id_rol=None):
+def actualizar_usuario(id_usuario, nombre=None, apellido=None, correo=None, contraseña=None, id_rol=None):
 
     # 1. Construir campos (validaciones incluidas)
     fields, values = construir_campos_actualizacion(
@@ -143,7 +143,7 @@ def actualizar_usuario(user_id, nombre=None, apellido=None, correo=None, contras
     )
 
     # 2. Ejecutar update
-    updated_user_data = actualizar_usuario_db(user_id, fields, values)
+    updated_user_data = actualizar_usuario_db(id_usuario, fields, values)
 
     if not updated_user_data:
         return None
@@ -164,10 +164,10 @@ def actualizar_usuario(user_id, nombre=None, apellido=None, correo=None, contras
 
     return user
     
-def cambio_estado(user_id):
+def cambio_estado(id_usuario):
 
     # 1. Ejecutar cambio
-    user_data = cambiar_estado_usuario_db(user_id)
+    user_data = cambiar_estado_usuario_db(id_usuario)
 
     if not user_data:
         return None

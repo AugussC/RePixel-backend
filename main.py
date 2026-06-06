@@ -3,6 +3,7 @@ from flask_cors import CORS
 from app.routes.user_routes import user_routes
 from app.routes.auth_routes import auth_routes
 from app.routes.image_routes import image_routes
+from app.routes.procesamiento_routes import procesamiento_routes
 from scheduler import iniciar_scheduler
 
 app = Flask(__name__)
@@ -26,6 +27,7 @@ iniciar_scheduler()
 app.register_blueprint(auth_routes)
 app.register_blueprint(user_routes)
 app.register_blueprint(image_routes)
+app.register_blueprint(procesamiento_routes)
 
 if __name__ == "__main__":
     app.run(debug=True)

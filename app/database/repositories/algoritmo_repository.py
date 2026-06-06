@@ -3,7 +3,7 @@ from psycopg2.extras import RealDictCursor
 
 from app.utils.processors import EnfocarProcessor, QuitarRuidoProcessor, BlancoNegroProcessor, RestaurarImagenProcessor, AjustarBrilloProcessor
 
-def obtener_procesador(nombre):
+def obtener_procesador(nombre_algoritmo):
 
     procesadores = {
         "restaurar imagen": RestaurarImagenProcessor(),
@@ -13,7 +13,7 @@ def obtener_procesador(nombre):
         "ajustar brillo": AjustarBrilloProcessor()
     }
 
-    return procesadores.get(nombre)
+    return procesadores.get(nombre_algoritmo)
 
 def obtener_algoritmo_por_nombre(nombre):
 
