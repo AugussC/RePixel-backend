@@ -15,14 +15,14 @@ def subir_imagen(filepath, user_id, id_tipoimagen):
     if metadata is None:
         return None
 
-    fecha, fecha_expiracion, altura, ancho, peso, nombre_archivo = metadata
+    fecha, fecha_expiracion, altura, ancho, peso_mb, nombre_archivo = metadata
     
     data = (
         altura,
         ancho,
         fecha,
         fecha_expiracion,
-        peso,
+        peso_mb,
         id_tipoimagen,
         user_id,
         filepath,

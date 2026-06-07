@@ -62,10 +62,10 @@ def obtener_imagenes_por_usuario_db(user_id):
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-        cursor.execute("""
-            SELECT * FROM imagen
-            WHERE id_usuario = %s AND estado = true
-        """, (user_id,))
+        cursor.execute(
+        "SELECT * FROM obtener_imagenes_activas_usuario(%s)",
+        (user_id,)
+        )
 
         return cursor.fetchall()
 
@@ -100,7 +100,7 @@ def obtener_tipo_imagen_disponible():
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute("""
-            SELECT id_tipoimagen, nombre_tipoimagen FROM tipo_image
+            SELECT id_tipoimagen, nombre_tipoimagen FROM tipoimagen
         """)
 
         return cursor.fetchall()

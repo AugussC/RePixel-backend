@@ -72,7 +72,7 @@ def obtener_imagen(id):
     return jsonify(image.to_dict()), 200
 
 @image_routes.route("/users/<id_usuario>/images", methods=["GET"])
-def obtener_imagenes_por_usuario(id_usuario):
+def obtener_imagenes_por_usuario_route(id_usuario):
 
     images = obtener_imagenes_por_usuario(int(id_usuario))
 
@@ -82,7 +82,7 @@ def obtener_imagenes_por_usuario(id_usuario):
     return jsonify([img.to_dict() for img in images]), 200
 
 @image_routes.route("/images/<id>/disable", methods=["PATCH"])
-def desactivar_imagen(id):
+def desactivar_imagen_route(id):
 
     success = desactivar_imagen(int(id))
 
