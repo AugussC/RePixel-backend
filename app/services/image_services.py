@@ -13,7 +13,9 @@ from app.models.image_model import Image
 def subir_imagen(filepath, user_id, id_tipoimagen):
     metadata = obtener_metadata_imagen(filepath)
     if metadata is None:
-        return None
+        raise ValueError(
+            "Ocurrió un error al intentar subir la imagen verifique que su imagen no esté dañada"
+        )
 
     fecha, fecha_expiracion, altura, ancho, peso_mb, nombre_archivo = metadata
     

@@ -160,14 +160,16 @@ def test_subir_imagen_corrupta(
 
     mock_metadata.return_value = None
 
-    resultado = subir_imagen(
-        "imagen_corrupta.jpg",
-        1,
-        2
+    with pytest.raises(ValueError) as excinfo:
+        subir_imagen(
+            "imagen_corrupta.jpg",
+            1,
+            2
+        )
+
+    assert str(excinfo.value) == (
+        "Ocurrió un error al intentar subir la imagen verifique que su imagen no esté dañada"
     )
-
-    assert resultado is None
-
 
 # ==================================================
 # CASO USUARIO INEXISTENTE
@@ -229,3 +231,125 @@ def test_request_con_archivo():
     )
 
     assert resultado == archivo
+
+    # ==================================================
+# USUARIO AUTENTICADO
+# ==================================================
+
+@patch("app.services.image_services.insertar_imagen")
+@patch("app.services.image_services.obtener_metadata_imagen")
+def test_subir_imagen_usuario_autenticado(
+    mock_metadata,
+    mock_insertar
+):
+
+    mock_metadata.return_value = (
+        "2025-08-01",
+        "2025-09-01",
+        800,
+        600,
+        1024,
+        "foto.jpg"
+    )
+
+    mock_insertar.return_value = {
+        "id_imagen": 1,
+        "altura": 800,
+        "ancho": 600,
+        "fecha_subida": "2025-08-01",
+        "fecha_expiracion": "2025-09-01",
+        "peso_subida": 1024,
+        "ruta": "uploads/foto.jpg",
+        "id_tipoimagen": 2,
+        "nombre_archivo": "foto.jpg"
+    }
+
+    resultado = subir_imagen(
+        "uploads/foto.jpg",
+        1,
+        2
+    )
+
+    assert resultado is not None
+
+    # ==================================================
+# VINCULACION CON USUARIO
+# ==================================================
+
+@patch("app.services.image_services.insertar_imagen")
+@patch("app.services.image_services.obtener_metadata_imagen")
+def test_imagen_se_vincula_con_usuario(
+    mock_metadata,
+    mock_insertar
+):
+
+    mock_metadata.return_value = (
+        "2025-08-01",
+        "2025-09-01",
+        800,
+        600,
+        1024,
+        "foto.jpg"
+    )
+
+    mock_insertar.return_value = {
+        "id_imagen": 1,
+        "altura": 800,
+        "ancho": 600,
+        "fecha_subida": "2025-08-01",
+        "fecha_expiracion": "2025-09-01",
+        "peso_subida": 1024,
+        "ruta": "uploads/foto.jpg",
+        "id_tipoimagen": 2,
+        "nombre_archivo": "foto.jpg"
+    }
+
+    subir_imagen(
+        "uploads/foto.jpg",
+        55,
+        2
+    )
+
+    args = mock_insertar.call_args[0][0]
+
+    assert args[6] == 55
+
+    # ==================================================
+# PERSISTENCIA EN BASE DE DATOS
+# ==================================================
+
+@patch("app.services.image_services.insertar_imagen")
+@patch("app.services.image_services.obtener_metadata_imagen")
+def test_imagen_se_guarda_en_bd(
+    mock_metadata,
+    mock_insertar
+):
+
+    mock_metadata.return_value = (
+        "2025-08-01",
+        "2025-09-01",
+        800,
+        600,
+        1024,
+        "foto.jpg"
+    )
+
+    mock_insertar.return_value = {
+        "id_imagen": 1,
+        "altura": 800,
+        "ancho": 600,
+        "fecha_subida": "2025-08-01",
+        "fecha_expiracion": "2025-09-01",
+        "peso_subida": 1024,
+        "ruta": "uploads/foto.jpg",
+        "id_tipoimagen": 2,
+        "nombre_archivo": "foto.jpg"
+    }
+
+    subir_imagen(
+        "uploads/foto.jpg",
+        1,
+        2
+    )
+
+    mock_insertar.assert_called_once()
