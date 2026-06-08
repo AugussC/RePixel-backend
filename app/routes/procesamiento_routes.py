@@ -13,8 +13,8 @@ def procesar_imagen(id):
         id_imagen = int(id)
         
         resultado = procesar_imagen_service(id_imagen, algoritmo)
-
         return jsonify(resultado), 200
+    
     except Exception as e:
         return jsonify({
             "Ocurrio un error al procesar": str(e)
@@ -23,7 +23,7 @@ def procesar_imagen(id):
 @procesamiento_routes.route("/images/procesamientos/<id>/view", methods=["GET"])
 def ver_procesamiento(id):
     try:
-        procesamiento = obtener_procesamiento_por_id(int(id) if id.isdigit() else id)
+        procesamiento = obtener_procesamiento_por_id(int(id))
         
         if not procesamiento:
             return jsonify({

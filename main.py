@@ -4,6 +4,7 @@ from app.routes.user_routes import user_routes
 from app.routes.auth_routes import auth_routes
 from app.routes.image_routes import image_routes
 from app.routes.procesamiento_routes import procesamiento_routes
+from app.routes.tipo_imagen_routes import tipo_imagen_routes
 from scheduler import iniciar_scheduler
 
 app = Flask(__name__)
@@ -28,6 +29,7 @@ app.register_blueprint(auth_routes)
 app.register_blueprint(user_routes)
 app.register_blueprint(image_routes)
 app.register_blueprint(procesamiento_routes)
+app.register_blueprint(tipo_imagen_routes)
 
 if __name__ == "__main__":
     app.run(debug=True)

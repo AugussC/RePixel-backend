@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session
-from app.services.auth_services import login_usuario, registrar_usuario, obtener_usuario_actual
+from app.services.auth_services import iniciar_sesion, registrar_usuario, obtener_usuario_actual
 from app.utils.user_utils import crear_sesion_usuario, cerrar_sesion
 from app.utils.user_validators import validar_login_data, validar_register_data
 from app.database.repositories.user_repository import obtener_usuario_por_correo_db
@@ -7,12 +7,12 @@ from app.database.repositories.user_repository import obtener_usuario_por_correo
 auth_routes = Blueprint("auth_routes", __name__)
 
 @auth_routes.route("/login", methods=["POST"]) # Endpoint para iniciar sesión
-def iniciar_sesion():
+def iniciar_sesion_route():
     try:
         data = request.get_json()
         correo, password = validar_login_data(data)
     
-        user = login_usuario(correo, password) 
+        user = iniciar_sesion(correo, password) 
         if not user:
             return jsonify({
                 "error": "Correo o contraseña incorrectos"

@@ -4,6 +4,7 @@ flask-sqlalchemy
 python-dotenv
 psycopg2-binary
 python-dotenv
+pytest
 opencv-python
 apscheduler
 scikit-image

@@ -1,6 +1,6 @@
 from app.services.user_services import (crear_usuario, iniciar_sesion_usuario, obtener_usuario_por_id)
 
-def login_usuario(correo, password):
+def iniciar_sesion(correo, password):
     return iniciar_sesion_usuario(correo, password)
 
 

@@ -1,9 +1,6 @@
 import re
 
-from werkzeug.security import (
-    generate_password_hash,
-    check_password_hash
-)
+from werkzeug.security import (generate_password_hash,check_password_hash)
 
 # ==================================================
 # CONTRASEÑAS
@@ -19,15 +16,8 @@ def hash_password(password):
     return generate_password_hash(password)
 
 
-def verify_password(
-    hash_guardado,
-    password_plana
-):
-
-    return check_password_hash(
-        hash_guardado,
-        password_plana
-    )
+def verify_password(hash_guardado,password_plana):
+    return check_password_hash(hash_guardado,password_plana)
 
 
 # ==================================================
@@ -115,9 +105,7 @@ def detectar_xss(texto):
     return texto
 
 
-def validar_nombre_archivo_seguro(
-    filename
-):
+def validar_nombre_archivo_seguro(filename):
 
     extensiones_permitidas = {
         "jpg",
@@ -130,10 +118,7 @@ def validar_nombre_archivo_seguro(
             "Archivo sin extensión"
         )
 
-    extension = (
-        filename.lower()
-        .split(".")[-1]
-    )
+    extension = (filename.lower().split(".")[-1])
 
     if extension not in extensiones_permitidas:
         raise ValueError(
