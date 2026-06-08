@@ -1,75 +1,62 @@
-
+from abc import ABC, abstractmethod
 import cv2
 import numpy as np
 import os 
 from skimage import io 
 from skimage.restoration import richardson_lucy
 
-
-class EnfocarProcessor:
-
+class ImageProcessorStrategy(ABC):
+    @abstractmethod
+    def procesar(self, ruta: str) -> str:
+        """Método que deben implementar todas las estrategias de procesamiento."""
+        pass
+    
+class EnfocarProcessor(ImageProcessorStrategy):
     def procesar(self, ruta):
-
         img = cv2.imread(ruta)
-
         blur = cv2.GaussianBlur(img,(9, 9),2)
-
         resultado = cv2.addWeighted(img,1.3,blur,-0.3,0)
-
         ruta_salida = "uploads/mejorar_resolucion_result.jpg"
-
         cv2.imwrite(ruta_salida,resultado)
-
         return ruta_salida
 
 
-class QuitarRuidoProcessor:
-
+class QuitarRuidoProcessor(ImageProcessorStrategy):
     def procesar(self, ruta):
-
         img = cv2.imread(ruta)
-
+        
         if img is None:
             raise Exception("No se pudo cargar la imagen")
-
+        
         resultado = cv2.fastNlMeansDenoisingColored(img,None,10,10,7,21)
 
         ruta_salida = "uploads/sin_ruido_result.jpg"
-
         cv2.imwrite(ruta_salida,resultado)
-
         return ruta_salida
     
-class BlancoNegroProcessor:
-
+class BlancoNegroProcessor(ImageProcessorStrategy):
     def procesar(self, ruta):
-
         img = cv2.imread(ruta)
-
+        
         if img is None:
             raise Exception(
                 "No se pudo leer la imagen"
             )
-
+        
         resultado = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
+        
         ruta_salida = ("uploads/blanco_negro.jpg")
-
         cv2.imwrite(ruta_salida,resultado)
-
         return ruta_salida
     
-class RestaurarImagenProcessor:
-
+class RestaurarImagenProcessor(ImageProcessorStrategy):
     def procesar(self, ruta):
-        
         img = cv2.imread(ruta)
 
         if img is None:
             raise Exception("No se pudo leer la imagen")
 
         psf = np.ones((1, 15)) / 45
-
         # Separamos los canales BGR y aplicamos Richardson-Lucy a cada uno
         canal_azul, canal_verde, canal_rojo = cv2.split(img)
 
@@ -91,18 +78,14 @@ class RestaurarImagenProcessor:
         resultado = cv2.merge([canal_azul_restaurado, canal_verde_restaurado, canal_rojo_restaurado])
 
         ruta_salida = "uploads/restaurada.jpg"
-
         cv2.imwrite(ruta_salida,resultado)
-
         return ruta_salida
     
-class AjustarBrilloProcessor:
-
+class AjustarBrilloProcessor(ImageProcessorStrategy):
     def __init__(self, brillo=30):
         self.brillo = brillo
 
     def procesar(self, ruta):
-
         img = cv2.imread(ruta)
 
         if img is None:
@@ -111,7 +94,5 @@ class AjustarBrilloProcessor:
         resultado = cv2.convertScaleAbs(img,alpha=1.0,beta=self.brillo)
 
         ruta_salida = "uploads/ajustar_brillo_result.jpg"
-
         cv2.imwrite(ruta_salida,resultado)
-
         return ruta_salida
