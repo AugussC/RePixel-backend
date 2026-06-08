@@ -2,7 +2,6 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-
 from app.services.procesarImage_services import (
     procesar_imagen_service
 )
@@ -48,7 +47,14 @@ def test_procesar_enfoque(
         "Procesamiento exitoso"
     )
 
+    mock_actualizar.assert_called_once_with(
+        10,
+        estado="completado",
+        ruta_resultado="uploads/enfoque.jpg"
+    )
 
+
+@patch("app.services.procesarImage_services.actualizar_procesamiento")
 @patch("app.services.procesarImage_services.obtener_procesador")
 @patch("app.services.procesarImage_services.crear_procesamiento")
 @patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
@@ -57,7 +63,8 @@ def test_procesar_reduccion_ruido(
     mock_imagen,
     mock_algoritmo,
     mock_crear,
-    mock_procesador
+    mock_procesador,
+    mock_actualizar
 ):
 
     imagen = MagicMock()
@@ -84,6 +91,7 @@ def test_procesar_reduccion_ruido(
     )
 
 
+@patch("app.services.procesarImage_services.actualizar_procesamiento")
 @patch("app.services.procesarImage_services.obtener_procesador")
 @patch("app.services.procesarImage_services.crear_procesamiento")
 @patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
@@ -92,7 +100,8 @@ def test_procesar_brillo(
     mock_imagen,
     mock_algoritmo,
     mock_crear,
-    mock_procesador
+    mock_procesador,
+    mock_actualizar
 ):
 
     imagen = MagicMock()
@@ -117,6 +126,7 @@ def test_procesar_brillo(
     assert resultado["id_procesamiento"] == 12
 
 
+@patch("app.services.procesarImage_services.actualizar_procesamiento")
 @patch("app.services.procesarImage_services.obtener_procesador")
 @patch("app.services.procesarImage_services.crear_procesamiento")
 @patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
@@ -125,7 +135,8 @@ def test_procesar_blanco_negro(
     mock_imagen,
     mock_algoritmo,
     mock_crear,
-    mock_procesador
+    mock_procesador,
+    mock_actualizar
 ):
 
     imagen = MagicMock()
@@ -152,6 +163,7 @@ def test_procesar_blanco_negro(
     )
 
 
+@patch("app.services.procesarImage_services.actualizar_procesamiento")
 @patch("app.services.procesarImage_services.obtener_procesador")
 @patch("app.services.procesarImage_services.crear_procesamiento")
 @patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
@@ -160,7 +172,8 @@ def test_procesar_restauracion(
     mock_imagen,
     mock_algoritmo,
     mock_crear,
-    mock_procesador
+    mock_procesador,
+    mock_actualizar
 ):
 
     imagen = MagicMock()
@@ -209,13 +222,22 @@ def test_procesar_sin_imagen(
     )
 
 
-def test_procesar_parametros_vacios():
+@patch("app.services.procesarImage_services.obtener_imagen_por_id")
+def test_procesar_id_imagen_invalido(
+    mock_imagen
+):
 
-    with pytest.raises(Exception):
+    mock_imagen.return_value = None
+
+    with pytest.raises(Exception) as exc:
         procesar_imagen_service(
             None,
-            None
+            "enfocar"
         )
+
+    assert str(exc.value) == (
+        "Imagen no encontrada"
+    )
 
 
 @patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
@@ -242,6 +264,7 @@ def test_procesar_algoritmo_inexistente(
     )
 
 
+@patch("app.services.procesarImage_services.actualizar_procesamiento")
 @patch("app.services.procesarImage_services.obtener_procesador")
 @patch("app.services.procesarImage_services.crear_procesamiento")
 @patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
@@ -250,7 +273,8 @@ def test_procesar_imagen_corrupta(
     mock_imagen,
     mock_algoritmo,
     mock_crear,
-    mock_procesador
+    mock_procesador,
+    mock_actualizar
 ):
 
     imagen = MagicMock()
@@ -278,7 +302,7 @@ def test_procesar_imagen_corrupta(
 @patch("app.services.procesarImage_services.crear_procesamiento")
 @patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
 @patch("app.services.procesarImage_services.obtener_imagen_por_id")
-def test_procesar_error_interno(
+def test_procesar_error_interno_excepcion(
     mock_imagen,
     mock_algoritmo,
     mock_crear,
@@ -318,3 +342,128 @@ def test_procesar_imagen_eliminada(
             99,
             "enfocar"
         )
+
+
+@patch("app.services.procesarImage_services.actualizar_procesamiento")
+@patch("app.services.procesarImage_services.obtener_procesador")
+@patch("app.services.procesarImage_services.crear_procesamiento")
+@patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
+@patch("app.services.procesarImage_services.obtener_imagen_por_id")
+def test_se_registra_procesamiento(
+    mock_imagen,
+    mock_algoritmo,
+    mock_crear,
+    mock_procesador,
+    mock_actualizar
+):
+
+    imagen = MagicMock()
+    imagen.ruta = "uploads/test.jpg"
+
+    mock_imagen.return_value = imagen
+
+    mock_algoritmo.return_value = {
+        "id_algoritmo": 1
+    }
+
+    mock_crear.return_value = {
+        "id_procesamiento": 20
+    }
+
+    procesador = MagicMock()
+    procesador.procesar.return_value = (
+        "uploads/resultado.jpg"
+    )
+
+    mock_procesador.return_value = procesador
+
+    procesar_imagen_service(
+        1,
+        "enfocar"
+    )
+
+    mock_crear.assert_called_once_with(
+        id_imagen=1,
+        id_algoritmo=1,
+        estado="procesando"
+    )
+
+# ==================================================
+# ALGORITMO VACÍO
+# ==================================================
+
+@patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
+@patch("app.services.procesarImage_services.obtener_imagen_por_id")
+def test_procesar_algoritmo_vacio(
+    mock_imagen,
+    mock_algoritmo
+):
+
+    imagen = MagicMock()
+    imagen.ruta = "uploads/test.jpg"
+
+    mock_imagen.return_value = imagen
+    mock_algoritmo.return_value = None
+
+    with pytest.raises(Exception) as exc:
+        procesar_imagen_service(
+            1,
+            ""
+        )
+
+    assert str(exc.value) == (
+        "Algoritmo no encontrado"
+    )
+
+# ==================================================
+# PROCESAMIENTO FALLIDO ACTUALIZA ESTADO ERROR
+# ==================================================
+
+@patch("app.services.procesarImage_services.actualizar_procesamiento")
+@patch("app.services.procesarImage_services.obtener_procesador")
+@patch("app.services.procesarImage_services.crear_procesamiento")
+@patch("app.services.procesarImage_services.obtener_algoritmo_por_nombre")
+@patch("app.services.procesarImage_services.obtener_imagen_por_id")
+def test_procesamiento_fallido_actualiza_estado_error(
+    mock_imagen,
+    mock_algoritmo,
+    mock_crear,
+    mock_procesador,
+    mock_actualizar
+):
+
+    imagen = MagicMock()
+    imagen.ruta = "uploads/test.jpg"
+
+    mock_imagen.return_value = imagen
+
+    mock_algoritmo.return_value = {
+        "id_algoritmo": 1
+    }
+
+    mock_crear.return_value = {
+        "id_procesamiento": 50
+    }
+
+    procesador = MagicMock()
+
+    procesador.procesar.side_effect = (
+        Exception("Error interno")
+    )
+
+    mock_procesador.return_value = procesador
+
+    with pytest.raises(Exception) as exc:
+        procesar_imagen_service(
+            1,
+            "enfocar"
+        )
+
+    assert str(exc.value) == (
+        "Error interno"
+    )
+
+    mock_actualizar.assert_called_with(
+        50,
+        estado="error"
+    )
