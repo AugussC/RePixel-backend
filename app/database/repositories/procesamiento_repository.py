@@ -6,29 +6,26 @@ def crear_procesamiento(id_imagen, id_algoritmo, estado="procesando"):
     connection = abrir_conexion()
 
     try:
-
         cursor = connection.cursor(
             cursor_factory=RealDictCursor
         )
 
         cursor.execute("""
-            INSERT INTO Procesamiento (
-                estado,
-                fecha_procesamiento,
+            INSERT INTO procesamiento (
                 id_imagen,
-                id_algoritmo
+                id_algoritmo,
+                estado_procesamiento
             )
             VALUES (
                 %s,
-                NOW(),
                 %s,
                 %s
             )
             RETURNING *
         """, (
-            estado,
             id_imagen,
-            id_algoritmo
+            id_algoritmo,
+            estado
         ))
 
         result = cursor.fetchone()
@@ -38,9 +35,7 @@ def crear_procesamiento(id_imagen, id_algoritmo, estado="procesando"):
         return result
 
     except Exception as e:
-
         connection.rollback()
-
         raise e
     
 def obtener_procesamiento_por_id(id_procesamiento):
@@ -55,7 +50,7 @@ def obtener_procesamiento_por_id(id_procesamiento):
 
         cursor.execute("""
             SELECT p.*, a.nombre AS nombre_algoritmo
-            FROM Procesamiento p JOIN Algoritmo a ON p.id_algoritmo = a.id_algoritmo
+            FROM procesamiento p JOIN algoritmo a ON p.id_algoritmo = a.id_algoritmo
             WHERE id_procesamiento = %s
         """, (id_procesamiento,))
 
@@ -76,7 +71,7 @@ def actualizar_procesamiento(id_procesamiento, estado=None, ruta_resultado=None)
         values = []
 
         if estado:
-            fields.append("estado = %s")
+            fields.append("estado_procesamiento = %s")
             values.append(estado)
 
         if ruta_resultado:
@@ -91,7 +86,7 @@ def actualizar_procesamiento(id_procesamiento, estado=None, ruta_resultado=None)
 
         # El WHERE ya no lleva un %s hardcodeado extra si mapeamos correctamente
         query = f"""
-            UPDATE Procesamiento
+            UPDATE procesamiento
             SET {', '.join(fields)}
             WHERE id_procesamiento = %s
             RETURNING *
@@ -143,7 +138,7 @@ def eliminar_procesamiento(
         )
 
         cursor.execute("""
-            DELETE FROM Procesamiento
+            DELETE FROM procesamiento
             WHERE id_procesamiento = %s
         """, (id_procesamiento,))
 

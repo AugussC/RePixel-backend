@@ -3,9 +3,9 @@ from app.models.entidadBase import EntidadBase
 
 
 class Procesamiento(EntidadBase):
-    def __init__(self, id_procesamiento, estado, fecha_procesamiento,ruta_resultado, algoritmo,  Imagen):
+    def __init__(self, id_procesamiento, fecha_procesamiento,ruta_resultado, algoritmo,  Imagen, estado_procesamiento):
         super().__init__(id_procesamiento)
-        self.estado = estado
+        self.estado_procesamiento = estado_procesamiento
         self.fecha_procesamiento = fecha_procesamiento
         self.ruta_resultado = ruta_resultado
         self.algoritmo = algoritmo
@@ -14,7 +14,7 @@ class Procesamiento(EntidadBase):
     def to_dict(self):
         return {
             'id_procesamiento': self.id,
-            'estado': self.estado,
+            'estado_procesamiento': self.estado_procesamiento,
             'ruta_resultado': self.ruta_resultado,
             'algoritmo': self.algoritmo,
             'fecha_procesamiento': self.fecha_procesamiento,

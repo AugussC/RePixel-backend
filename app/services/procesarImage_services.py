@@ -15,9 +15,7 @@ def procesar_imagen_service(id_imagen, algoritmo):
     if not imagen:
         raise Exception("Imagen no encontrada")
 
-    algoritmo_db = obtener_algoritmo_por_nombre(
-        algoritmo
-    )
+    algoritmo_db = obtener_algoritmo_por_nombre(algoritmo)
 
     if not algoritmo_db:
         raise Exception(
@@ -32,13 +30,9 @@ def procesar_imagen_service(id_imagen, algoritmo):
 
     try:
 
-        procesador = obtener_procesador(
-            algoritmo
-        )
+        procesador = obtener_procesador(algoritmo)
 
-        ruta_resultado = procesador.procesar(
-            imagen.ruta
-        )
+        ruta_resultado = procesador.procesar(imagen.ruta)
 
         actualizar_procesamiento(
             procesamiento["id_procesamiento"],

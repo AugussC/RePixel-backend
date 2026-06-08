@@ -13,9 +13,12 @@ def obtener_metadata_imagen(filepath):
     
     nombre_archivo=os.path.basename(filepath)
     altura, ancho = img.shape[:2]
-    peso = os.path.getsize(filepath)
+    
+    peso_bytes = os.path.getsize(filepath)
+    peso_mb = peso_bytes / (1024 * 1024)
+    
     fecha, expiracion = obtener_fechas_expiracion()
-    return fecha, expiracion, altura, ancho, peso, nombre_archivo
+    return fecha, expiracion, altura, ancho, peso_mb, nombre_archivo
     
 
 
