@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.services.user_services import obtener_todos_los_usuarios, actualizar_usuario,obtener_usuario_por_email,cambio_estado, obtener_usuario_por_id
+from app.services.user_services import obtener_usuario_por_email, obtener_usuario_por_id
 
 user_routes = Blueprint("user_routes", __name__)
 
