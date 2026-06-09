@@ -4,32 +4,16 @@ from psycopg2.extras import RealDictCursor
 def crear_procesamiento(id_imagen, id_algoritmo, estado="procesando"):
 
     connection = abrir_conexion()
-
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute("""
-            INSERT INTO procesamiento (
-                id_imagen,
-                id_algoritmo,
-                estado_procesamiento
-            )
-            VALUES (
-                %s,
-                %s,
-                %s
-            )
+            INSERT INTO procesamiento (id_imagen,id_algoritmo,estado_procesamiento)
+            VALUES (%s,%s,%s)
             RETURNING *
-        """, (
-            id_imagen,
-            id_algoritmo,
-            estado
-        ))
-
+        """, (id_imagen,id_algoritmo,estado))
         result = cursor.fetchone()
-
         connection.commit()
-
         return result
 
     except Exception as e:
@@ -54,37 +38,18 @@ def obtener_procesamiento_por_id(id_procesamiento):
         connection.rollback()
         raise e
     
-def actualizar_procesamiento(id_procesamiento, estado=None, ruta_resultado=None):
+def actualizar_procesamiento(id_procesamiento,estado=None,ruta_resultado=None):
     connection = abrir_conexion()
+
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
-
-        fields = []
-        values = []
-
-        if estado:
-            fields.append("estado_procesamiento = %s")
-            values.append(estado)
-
-        if ruta_resultado:
-            fields.append("ruta_resultado = %s")
-            values.append(ruta_resultado)
-
-        if not fields:
-            return None
-
-        # Agregamos el ID al final de los valores para el WHERE
-        values.append(id_procesamiento)
-
-        # El WHERE ya no lleva un %s hardcodeado extra si mapeamos correctamente
-        query = f"""
-            UPDATE procesamiento
-            SET {', '.join(fields)}
-            WHERE id_procesamiento = %s
-            RETURNING *
-        """
-
-        cursor.execute(query, tuple(values))
+        cursor.execute(
+            """
+            SELECT *
+            FROM actualizar_procesamiento(%s,%s,%s)
+            """,
+            (id_procesamiento,estado,ruta_resultado)
+        )
         result = cursor.fetchone()
         connection.commit()
         return result
@@ -98,7 +63,6 @@ def obtener_procesamientos_por_imagen(id_imagen):
 
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
-
         cursor.execute("""
             SELECT p.*, a.nombre AS nombre_algoritmo
             FROM Procesamiento p JOIN Algoritmo a ON p.id_algoritmo = a.id_algoritmo

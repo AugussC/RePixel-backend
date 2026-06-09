@@ -3,29 +3,14 @@ from psycopg2.extras import RealDictCursor
 
 def insertar_imagen(data):
     connection = abrir_conexion()
+
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
-
-        query = """
-            INSERT INTO imagen (
-                altura,
-                ancho,
-                fecha_subida,
-                fecha_expiracion,
-                peso_subida,
-                id_tipoimagen,
-                id_usuario,
-                ruta,
-                estado,
-                nombre_archivo
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, true, %s)
-            RETURNING *
-        """
-
-        cursor.execute(query, data)
+        cursor.execute("""
+            SELECT *
+            FROM insertar_imagen(%s, %s, %s, %s, %s,%s, %s, %s, %s)
+        """, data)
         result = cursor.fetchone()
-
         connection.commit()
         return result
 
@@ -71,21 +56,19 @@ def obtener_imagenes_por_usuario_db(user_id):
         connection.rollback()
         raise e
     
-def desactivar_imagen_db(image_id, fecha_expiracion):
+def desactivar_imagen_db(image_id):
     connection = abrir_conexion()
 
     try:
         cursor = connection.cursor()
 
-        cursor.execute("""
-            UPDATE imagen
-            SET estado = false,
-                fecha_expiracion = %s
-            WHERE id_imagen = %s
-        """, (fecha_expiracion, image_id))
-
+        cursor.execute(
+            "SELECT desactivar_imagen(%s)",
+            (image_id,)
+        )
+        result = cursor.fetchone()
         connection.commit()
-        return True
+        return result[0]
 
     except Exception as e:
         connection.rollback()
