@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, send_file
 from app.database.repositories.procesamiento_repository import obtener_procesamiento_por_id
+from app.models.procesamiento_model import Procesamiento
 from app.services.procesarImage_services import procesar_imagen_service
 
 procesamiento_routes = Blueprint("procesamiento_routes", __name__)
@@ -35,3 +36,19 @@ def ver_procesamiento(id):
         return jsonify({
             "error": str(e)
         }), 500
+
+@procesamiento_routes.route("/images/procesamientos/<id>/descargar", methods=["GET"])
+def descargar_procesamiento(id):
+    try:
+        procesamiento = obtener_procesamiento_por_id(int(id))
+
+        if not procesamiento or not procesamiento["ruta_resultado"]:
+            return jsonify({"error": "Archivo no encontrado"}), 404
+
+        return send_file(
+            procesamiento["ruta_resultado"],
+            as_attachment=True,
+            download_name="repixel_resultado.png"
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

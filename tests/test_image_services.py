@@ -2,12 +2,7 @@ import pytest
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 from app.services.image_services import subir_imagen
-from app.utils.imagen_validators import (
-    validar_extension_archivo,
-    validar_nombre_archivo,
-    validar_tamano_archivo,
-    validar_archivo_en_request,
-)
+from app.utils.imagen_validators import (validar_extension_archivo,validar_nombre_archivo,validar_tamano_archivo,validar_archivo_en_request)
 
 # ==================================================
 # VALIDAR EXTENSIONES
@@ -29,9 +24,7 @@ def test_subir_gif():
     with pytest.raises(ValueError) as excinfo:
         validar_extension_archivo("animacion.gif")
 
-    assert str(excinfo.value) == (
-        "La imagen debe tener formato (JPG/PNG/JPEG)"
-    )
+    assert str(excinfo.value) == ("La imagen debe tener formato (JPG/PNG/JPEG)")
 
 
 def test_subir_bmp():
@@ -61,9 +54,7 @@ def test_subir_archivo_vacio():
     with pytest.raises(ValueError) as excinfo:
         validar_nombre_archivo(file)
 
-    assert str(excinfo.value) == (
-        "Nombre de archivo inválido"
-    )
+    assert str(excinfo.value) == ("Nombre de archivo inválido")
 
 
 def test_nombre_archivo_valido():
@@ -80,34 +71,23 @@ def test_nombre_archivo_valido():
 
 def test_subir_imagen_0_1mb():
 
-    contenido = BytesIO(
-        b"a" * 100000
-    )
-
+    contenido = BytesIO(b"a" * 100000)
     validar_tamano_archivo(contenido)
 
 
 def test_subir_imagen_5mb():
 
-    contenido = BytesIO(
-        b"a" * (5 * 1024 * 1024)
-    )
-
+    contenido = BytesIO(b"a" * (5 * 1024 * 1024))
     validar_tamano_archivo(contenido)
 
 
 def test_subir_imagen_mayor_5mb():
 
-    contenido = BytesIO(
-        b"a" * ((5 * 1024 * 1024) + 1)
-    )
-
+    contenido = BytesIO(b"a" * ((5 * 1024 * 1024) + 1))
     with pytest.raises(ValueError) as excinfo:
         validar_tamano_archivo(contenido)
 
-    assert str(excinfo.value) == (
-        "Su imagen supera el límite de tamaño de 5MB"
-    )
+    assert str(excinfo.value) == ("Su imagen supera el límite de tamaño de 5MB")
 
 
 # ==================================================
@@ -116,11 +96,7 @@ def test_subir_imagen_mayor_5mb():
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
-def test_subir_imagen_exitosamente(
-    mock_metadata,
-    mock_insertar
-):
-
+def test_subir_imagen_exitosamente(mock_metadata,mock_insertar):
     mock_metadata.return_value = (
         "2025-08-01",
         "2025-09-01",
@@ -154,9 +130,7 @@ def test_subir_imagen_exitosamente(
 
 
 @patch("app.services.image_services.obtener_metadata_imagen")
-def test_subir_imagen_corrupta(
-    mock_metadata
-):
+def test_subir_imagen_corrupta(mock_metadata):
 
     mock_metadata.return_value = None
 
@@ -177,10 +151,7 @@ def test_subir_imagen_corrupta(
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
-def test_subir_usuario_inexistente(
-    mock_metadata,
-    mock_insertar
-):
+def test_subir_usuario_inexistente(mock_metadata,mock_insertar):
 
     mock_metadata.return_value = (
         "2025-08-01",
@@ -190,10 +161,7 @@ def test_subir_usuario_inexistente(
         1024,
         "foto.jpg"
     )
-
-    mock_insertar.side_effect = Exception(
-        "Usuario no encontrado"
-    )
+    mock_insertar.side_effect = Exception("Usuario no encontrado")
 
     with pytest.raises(Exception) as excinfo:
         subir_imagen(
@@ -201,10 +169,7 @@ def test_subir_usuario_inexistente(
             999,
             2
         )
-
-    assert str(excinfo.value) == (
-        "Usuario no encontrado"
-    )
+    assert str(excinfo.value) == ("Usuario no encontrado")
 
 
 # ==================================================
@@ -217,31 +182,22 @@ def test_request_sin_archivo():
     with pytest.raises(ValueError) as excinfo:
         validar_archivo_en_request({})
 
-    assert str(excinfo.value) == (
-        "No se envió ningún archivo"
-    )
+    assert str(excinfo.value) == ("No se envió ningún archivo")
 
 
 def test_request_con_archivo():
 
     archivo = MagicMock()
-
-    resultado = validar_archivo_en_request(
-        {"file": archivo}
-    )
-
+    resultado = validar_archivo_en_request({"file": archivo})
     assert resultado == archivo
 
-    # ==================================================
+# ==================================================
 # USUARIO AUTENTICADO
 # ==================================================
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
-def test_subir_imagen_usuario_autenticado(
-    mock_metadata,
-    mock_insertar
-):
+def test_subir_imagen_usuario_autenticado(mock_metadata,mock_insertar):
 
     mock_metadata.return_value = (
         "2025-08-01",
@@ -272,16 +228,13 @@ def test_subir_imagen_usuario_autenticado(
 
     assert resultado is not None
 
-    # ==================================================
+# ==================================================
 # VINCULACION CON USUARIO
 # ==================================================
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
-def test_imagen_se_vincula_con_usuario(
-    mock_metadata,
-    mock_insertar
-):
+def test_imagen_se_vincula_con_usuario(mock_metadata,mock_insertar):
 
     mock_metadata.return_value = (
         "2025-08-01",
@@ -311,19 +264,15 @@ def test_imagen_se_vincula_con_usuario(
     )
 
     args = mock_insertar.call_args[0][0]
-
     assert args[6] == 55
 
-    # ==================================================
+# ==================================================
 # PERSISTENCIA EN BASE DE DATOS
 # ==================================================
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
-def test_imagen_se_guarda_en_bd(
-    mock_metadata,
-    mock_insertar
-):
+def test_imagen_se_guarda_en_bd(mock_metadata,mock_insertar):
 
     mock_metadata.return_value = (
         "2025-08-01",
@@ -351,5 +300,4 @@ def test_imagen_se_guarda_en_bd(
         1,
         2
     )
-
     mock_insertar.assert_called_once()

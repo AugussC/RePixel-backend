@@ -9,14 +9,10 @@ from app.services.image_services import desactivar_imagen
 # ==================================================
 
 @patch("app.services.image_services.desactivar_imagen_db")
-def test_eliminar_imagen_existente(
-    mock_desactivar
-):
+def test_eliminar_imagen_existente(mock_desactivar):
 
     mock_desactivar.return_value = True
-
     resultado = desactivar_imagen(1)
-
     assert resultado is True
     mock_desactivar.assert_called_once()
 
@@ -26,14 +22,10 @@ def test_eliminar_imagen_existente(
 # ==================================================
 
 @patch("app.services.image_services.desactivar_imagen_db")
-def test_eliminar_imagen_inexistente(
-    mock_desactivar
-):
+def test_eliminar_imagen_inexistente(mock_desactivar):
 
     mock_desactivar.return_value = False 
-
     resultado = desactivar_imagen(999)
-
     assert resultado is False
 
 
@@ -42,20 +34,13 @@ def test_eliminar_imagen_inexistente(
 # ==================================================
 
 @patch("app.services.image_services.desactivar_imagen_db")
-def test_eliminar_imagen_error(
-    mock_desactivar
-):
+def test_eliminar_imagen_error(mock_desactivar):
 
-    mock_desactivar.side_effect = Exception(
-        "Imagen no encontrada"
-    )
-
+    mock_desactivar.side_effect = Exception("Imagen no encontrada")
     with pytest.raises(Exception) as excinfo:
         desactivar_imagen(999)
 
-    assert str(excinfo.value) == (
-        "Imagen no encontrada"
-    )
+    assert str(excinfo.value) == ("Imagen no encontrada")
 
 
 # ==================================================
@@ -63,9 +48,7 @@ def test_eliminar_imagen_error(
 # ==================================================
 
 @patch("app.services.image_services.desactivar_imagen_db")
-def test_eliminar_imagen_doble(
-    mock_desactivar
-):
+def test_eliminar_imagen_doble(mock_desactivar):
 
     mock_desactivar.side_effect = [
         True,
@@ -84,12 +67,8 @@ def test_eliminar_imagen_doble(
 # ==================================================
 
 @patch("app.services.image_services.desactivar_imagen_db")
-def test_desactivar_imagen_llama_repositorio(
-    mock_desactivar
-):
+def test_desactivar_imagen_llama_repositorio(mock_desactivar):
 
     mock_desactivar.return_value = True
-
     desactivar_imagen(5)
-
     mock_desactivar.assert_called_once()

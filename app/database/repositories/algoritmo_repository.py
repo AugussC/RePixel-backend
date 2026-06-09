@@ -1,7 +1,7 @@
 from app.database.connection import abrir_conexion
 from psycopg2.extras import RealDictCursor
 
-def obtener_algoritmo_por_nombre(nombre):
+def obtener_algoritmo_por_nombre(nombre_algoritmo):
     connection = abrir_conexion()
 
     try:
@@ -9,7 +9,7 @@ def obtener_algoritmo_por_nombre(nombre):
 
         cursor.execute(
             "SELECT * FROM obtener_algoritmo_por_nombre(%s)",
-            (nombre,)
+            (nombre_algoritmo,)
         )
         return cursor.fetchone()
 

@@ -58,21 +58,6 @@ def actualizar_procesamiento(id_procesamiento,estado=None,ruta_resultado=None):
         connection.rollback()
         raise e
     
-def obtener_procesamientos_por_imagen(id_imagen):
-    connection = abrir_conexion()
-
-    try:
-        cursor = connection.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("""
-            SELECT p.*, a.nombre AS nombre_algoritmo
-            FROM Procesamiento p JOIN Algoritmo a ON p.id_algoritmo = a.id_algoritmo
-            WHERE id_imagen = %s
-        """, (id_imagen,))
-        return cursor.fetchall()
-
-    except Exception as e:
-        connection.rollback()
-        raise e
     
 def eliminar_procesamiento(id_procesamiento):
     connection = abrir_conexion()
