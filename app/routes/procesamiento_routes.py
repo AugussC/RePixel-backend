@@ -20,7 +20,7 @@ def procesar_imagen_route(id):
             "Ocurrio un error al procesar": str(e)
         }), 400
 
-@procesamiento_routes.route("/images/procesamientos/<id>/view", methods=["GET"])
+@procesamiento_routes.route("/images/procesamientos/<id_procesamiento>/view", methods=["GET"])
 def ver_procesamiento(id_procesamiento):
     try:
         procesamiento = obtener_procesamiento_por_id(int(id_procesamiento))
@@ -36,7 +36,7 @@ def ver_procesamiento(id_procesamiento):
             "error": str(e)
         }), 500
 
-@procesamiento_routes.route("/images/procesamientos/<id>/descargar", methods=["GET"])
+@procesamiento_routes.route("/images/procesamientos/<id_procesamiento>/descargar", methods=["GET"])
 def descargar_procesamiento(id_procesamiento):
     try:
         procesamiento = obtener_procesamiento_por_id(int(id_procesamiento))

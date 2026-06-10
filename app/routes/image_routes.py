@@ -40,7 +40,7 @@ def subir():
             "error": str(e)
         }), 500
         
-@image_routes.route("/images/<id>/view")
+@image_routes.route("/images/<id_imagen>/view")
 def ver_imagen(id_imagen):
 
     image = obtener_imagen_por_id(int(id_imagen))
