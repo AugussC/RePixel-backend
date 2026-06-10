@@ -4,10 +4,6 @@ from unittest.mock import patch
 from app.services.image_services import desactivar_imagen
 
 
-# ==================================================
-# ELIMINAR IMAGEN EXISTENTE
-# ==================================================
-
 @patch("app.services.image_services.desactivar_imagen_db")
 def test_eliminar_imagen_existente(mock_desactivar):
 
@@ -16,22 +12,12 @@ def test_eliminar_imagen_existente(mock_desactivar):
     assert resultado is True
     mock_desactivar.assert_called_once()
 
-
-# ==================================================
-# ELIMINAR IMAGEN INEXISTENTE
-# ==================================================
-
 @patch("app.services.image_services.desactivar_imagen_db")
 def test_eliminar_imagen_inexistente(mock_desactivar):
 
     mock_desactivar.return_value = False 
     resultado = desactivar_imagen(999)
     assert resultado is False
-
-
-# ==================================================
-# ERROR AL ELIMINAR
-# ==================================================
 
 @patch("app.services.image_services.desactivar_imagen_db")
 def test_eliminar_imagen_error(mock_desactivar):
@@ -42,10 +28,6 @@ def test_eliminar_imagen_error(mock_desactivar):
 
     assert str(excinfo.value) == ("Imagen no encontrada")
 
-
-# ==================================================
-# ELIMINAR IMAGEN DOS VECES
-# ==================================================
 
 @patch("app.services.image_services.desactivar_imagen_db")
 def test_eliminar_imagen_doble(mock_desactivar):
@@ -61,14 +43,11 @@ def test_eliminar_imagen_doble(mock_desactivar):
     assert primer_resultado is True
     assert segundo_resultado is False
 
-
-# ==================================================
-# VERIFICAR QUE SE LLAMA AL REPOSITORIO
-# ==================================================
-
 @patch("app.services.image_services.desactivar_imagen_db")
 def test_desactivar_imagen_llama_repositorio(mock_desactivar):
 
     mock_desactivar.return_value = True
     desactivar_imagen(5)
     mock_desactivar.assert_called_once()
+    
+

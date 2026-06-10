@@ -4,10 +4,6 @@ from unittest.mock import MagicMock, patch
 from app.services.image_services import subir_imagen
 from app.utils.imagen_validators import (validar_extension_archivo,validar_nombre_archivo,validar_tamano_archivo,validar_archivo_en_request)
 
-# ==================================================
-# VALIDAR EXTENSIONES
-# ==================================================
-
 def test_subir_jpg_valido():
     assert validar_extension_archivo("foto.jpg") == 2
 
@@ -41,11 +37,6 @@ def test_subir_archivo_sin_extension():
     with pytest.raises(ValueError):
         validar_extension_archivo("archivo")
 
-
-# ==================================================
-# VALIDAR NOMBRE
-# ==================================================
-
 def test_subir_archivo_vacio():
 
     file = MagicMock()
@@ -63,11 +54,6 @@ def test_nombre_archivo_valido():
     file.filename = "foto.jpg"
 
     validar_nombre_archivo(file)
-
-
-# ==================================================
-# VALIDAR TAMAÑO
-# ==================================================
 
 def test_subir_imagen_0_1mb():
 
@@ -88,11 +74,6 @@ def test_subir_imagen_mayor_5mb():
         validar_tamano_archivo(contenido)
 
     assert str(excinfo.value) == ("Su imagen supera el límite de tamaño de 5MB")
-
-
-# ==================================================
-# SUBIR IMAGEN
-# ==================================================
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
@@ -145,10 +126,6 @@ def test_subir_imagen_corrupta(mock_metadata):
         "Ocurrió un error al intentar subir la imagen verifique que su imagen no esté dañada"
     )
 
-# ==================================================
-# CASO USUARIO INEXISTENTE
-# ==================================================
-
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
 def test_subir_usuario_inexistente(mock_metadata,mock_insertar):
@@ -171,12 +148,6 @@ def test_subir_usuario_inexistente(mock_metadata,mock_insertar):
         )
     assert str(excinfo.value) == ("Usuario no encontrado")
 
-
-# ==================================================
-# VALIDAR REQUEST
-# ==================================================
-
-
 def test_request_sin_archivo():
 
     with pytest.raises(ValueError) as excinfo:
@@ -191,9 +162,6 @@ def test_request_con_archivo():
     resultado = validar_archivo_en_request({"file": archivo})
     assert resultado == archivo
 
-# ==================================================
-# USUARIO AUTENTICADO
-# ==================================================
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
@@ -228,10 +196,6 @@ def test_subir_imagen_usuario_autenticado(mock_metadata,mock_insertar):
 
     assert resultado is not None
 
-# ==================================================
-# VINCULACION CON USUARIO
-# ==================================================
-
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")
 def test_imagen_se_vincula_con_usuario(mock_metadata,mock_insertar):
@@ -265,10 +229,6 @@ def test_imagen_se_vincula_con_usuario(mock_metadata,mock_insertar):
 
     args = mock_insertar.call_args[0][0]
     assert args[6] == 55
-
-# ==================================================
-# PERSISTENCIA EN BASE DE DATOS
-# ==================================================
 
 @patch("app.services.image_services.insertar_imagen")
 @patch("app.services.image_services.obtener_metadata_imagen")

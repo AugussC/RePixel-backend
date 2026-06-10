@@ -1,11 +1,9 @@
 import pytest
 from unittest.mock import patch
-from flask import Flask
+from flask import Flask, session
 from app.services.user_services import crear_usuario
 from app.utils.user_validators import (validar_login_data,validar_register_data,validar_usuario_autenticado)
-# ==================================================
-# REGISTRO DE USUARIO
-# ==================================================
+
 
 @patch("app.services.user_services.insertar_usuario_db")
 @patch("app.services.user_services.hash_password")
@@ -67,7 +65,6 @@ def test_registro_sin_nombre():
         })
 
     assert str(excinfo.value) == ("Todos los campos son obligatorios")
-
 
 
 def test_registro_sin_apellido():
@@ -150,15 +147,12 @@ def test_login_data_valida():
     assert password == "123456"
 
 
-##PREGUNTAR
 def test_usuario_autenticado():
 
     app = Flask(__name__)
     app.secret_key = "test"
 
     with app.test_request_context():
-        from flask import session
-
         session["user_id"] = 5
 
         resultado = validar_usuario_autenticado()
