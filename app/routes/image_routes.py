@@ -41,9 +41,9 @@ def subir():
         }), 500
         
 @image_routes.route("/images/<id>/view")
-def ver_imagen(id):
+def ver_imagen(id_imagen):
 
-    image = obtener_imagen_por_id(int(id))
+    image = obtener_imagen_por_id(int(id_imagen))
 
     print(image)
 

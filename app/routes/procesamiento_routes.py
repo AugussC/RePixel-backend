@@ -21,9 +21,9 @@ def procesar_imagen_route(id):
         }), 400
 
 @procesamiento_routes.route("/images/procesamientos/<id>/view", methods=["GET"])
-def ver_procesamiento(id):
+def ver_procesamiento(id_procesamiento):
     try:
-        procesamiento = obtener_procesamiento_por_id(int(id))
+        procesamiento = obtener_procesamiento_por_id(int(id_procesamiento))
         
         if not procesamiento:
             return jsonify({
