@@ -83,11 +83,15 @@ def obtener_imagenes_por_usuario_route(id_usuario):
 @image_routes.route("/images/<id>/disable", methods=["PATCH"])
 def desactivar_imagen_route(id):
 
-    success = desactivar_imagen(int(id))
+    resultado = desactivar_imagen(int(id))
 
-    if not success:
-        return jsonify({"error": "No se pudo desactivar"}), 400
+    if resultado == "NO_EXISTE":
+        return jsonify({"error": "Imagen no encontrada"}), 404
+    if resultado == "YA_DESACTIVADA":
+        return jsonify({"error": "Imagen previamente eliminada"}), 409
+    if resultado == "OK":
+        return jsonify({"message": "Imagen desactivada"}), 200
 
-    return jsonify({"message": "Imagen desactivada"}), 200
+    return jsonify({"error": "Error desconocido"}), 500
 
 
