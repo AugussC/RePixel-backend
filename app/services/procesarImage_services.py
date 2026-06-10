@@ -4,7 +4,7 @@ from app.database.repositories.algoritmo_repository import (obtener_algoritmo_po
 from app.services.image_services import obtener_imagen_por_id
 from app.services.processors_services import obtener_procesador
 
-def procesar_imagen_service(id_imagen, nombre_algoritmo):
+def procesar_imagen(id_imagen, nombre_algoritmo):
     imagen = obtener_imagen_por_id(id_imagen)
     if not imagen:
         raise Exception("Imagen no encontrada")
