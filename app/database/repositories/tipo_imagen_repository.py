@@ -11,7 +11,7 @@ def obtener_tipo_imagen_disponible():
             SELECT id_tipoimagen, nombre_tipoimagen FROM tipoimagen
         """)
         return cursor.fetchall()
-
+ 
     except Exception as e:
         connection.rollback()
         raise e
