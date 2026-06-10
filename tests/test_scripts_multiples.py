@@ -2,7 +2,7 @@
 from unittest.mock import MagicMock, patch
 import pytest
 from app.services.image_services import desactivar_imagen, subir_imagen
-from app.services.procesarImage_services import procesar_imagen_service
+from app.services.procesarImage_services import procesar_imagen
 from flask import Flask
 from app.utils.user_validators import validar_register_data
 
@@ -62,10 +62,10 @@ def test_procesar_imagen_multiple(mock_imagen, mock_algoritmo, mock_crear, mock_
     mock_procesador.return_value = procesador
 
 
-    resultado1 = procesar_imagen_service(1, "enfocar")
+    resultado1 = procesar_imagen(1, "enfocar")
     assert resultado1["mensaje"] == "Procesamiento exitoso"
 
-    resultado2 = procesar_imagen_service(1, "enfocar")
+    resultado2 = procesar_imagen(1, "enfocar")
     assert resultado2["mensaje"] == "Procesamiento exitoso"
 
 

@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-from app.services.procesarImage_services import (procesar_imagen_service)
+from app.services.procesarImage_services import (procesar_imagen)
 
 
 @patch("app.services.procesarImage_services.actualizar_procesamiento")
@@ -22,7 +22,7 @@ def test_procesar_enfoque(mock_imagen,mock_algoritmo,mock_crear,mock_procesador,
     procesador.procesar.return_value = ("uploads/enfoque.jpg")
 
     mock_procesador.return_value = procesador
-    resultado = procesar_imagen_service(1,"enfocar")
+    resultado = procesar_imagen(1,"enfocar")
 
     assert resultado["mensaje"] == ("Procesamiento exitoso")
 
@@ -50,7 +50,7 @@ def test_procesar_reduccion_ruido(mock_imagen,mock_algoritmo,mock_crear,mock_pro
     procesador = MagicMock()
     procesador.procesar.return_value = ("uploads/sin_ruido.jpg")
     mock_procesador.return_value = procesador
-    resultado = procesar_imagen_service(1,"quitar_ruido")
+    resultado = procesar_imagen(1,"quitar_ruido")
 
     assert resultado["ruta_resultado"] == ("uploads/sin_ruido.jpg")
 
@@ -73,7 +73,7 @@ def test_procesar_brillo(mock_imagen,mock_algoritmo,mock_crear,mock_procesador, 
     procesador.procesar.return_value = ("uploads/brillo.jpg")
     mock_procesador.return_value = procesador
 
-    resultado = procesar_imagen_service(1,"ajustar_brillo")
+    resultado = procesar_imagen(1,"ajustar_brillo")
     assert resultado["id_procesamiento"] == 12
 
 
@@ -95,7 +95,7 @@ def test_procesar_blanco_negro(mock_imagen,mock_algoritmo,mock_crear,mock_proces
     procesador.procesar.return_value = ("uploads/bn.jpg")
     mock_procesador.return_value = procesador
 
-    resultado = procesar_imagen_service(1,"blanco_negro")
+    resultado = procesar_imagen(1,"blanco_negro")
 
     assert resultado["ruta_resultado"] == ("uploads/bn.jpg")
 
@@ -118,7 +118,7 @@ def test_procesar_restauracion(mock_imagen,mock_algoritmo,mock_crear,mock_proces
     procesador.procesar.return_value = ("uploads/restaurada.jpg")
     mock_procesador.return_value = procesador
 
-    resultado = procesar_imagen_service(1,"restaurar")
+    resultado = procesar_imagen(1,"restaurar")
 
     assert resultado["ruta_resultado"] == ("uploads/restaurada.jpg")
 
@@ -130,7 +130,7 @@ def test_procesar_sin_imagen(mock_imagen):
     mock_imagen.return_value = None
 
     with pytest.raises(Exception) as exc:
-        procesar_imagen_service(1,"enfocar")
+        procesar_imagen(1,"enfocar")
 
     assert str(exc.value) == ("Imagen no encontrada")
 
@@ -141,7 +141,7 @@ def test_procesar_id_imagen_invalido(mock_imagen):
     mock_imagen.return_value = None
 
     with pytest.raises(Exception) as exc:
-        procesar_imagen_service(None,"enfocar")
+        procesar_imagen(None,"enfocar")
 
     assert str(exc.value) == ("Imagen no encontrada")
 
@@ -157,7 +157,7 @@ def test_procesar_algoritmo_inexistente(mock_imagen,mock_algoritmo):
     mock_algoritmo.return_value = None
 
     with pytest.raises(Exception) as exc:
-        procesar_imagen_service(1,"fake")
+        procesar_imagen(1,"fake")
         
     assert str(exc.value) == (
         "Algoritmo no encontrado"
@@ -183,7 +183,7 @@ def test_procesar_imagen_corrupta(mock_imagen,mock_algoritmo,mock_crear,mock_pro
     mock_procesador.return_value = procesador
 
     with pytest.raises(Exception):
-        procesar_imagen_service(1,"enfocar")
+        procesar_imagen(1,"enfocar")
 
 
 @patch("app.services.procesarImage_services.obtener_procesador")
@@ -204,7 +204,7 @@ def test_procesar_error_interno_excepcion(mock_imagen,mock_algoritmo,mock_crear,
     mock_procesador.return_value = procesador
 
     with pytest.raises(Exception):
-        procesar_imagen_service(1,"enfocar")
+        procesar_imagen(1,"enfocar")
 
 
 @patch("app.services.procesarImage_services.obtener_imagen_por_id")
@@ -212,7 +212,7 @@ def test_procesar_imagen_eliminada(mock_imagen):
 
     mock_imagen.return_value = None
     with pytest.raises(Exception):
-        procesar_imagen_service(99,"enfocar")
+        procesar_imagen(99,"enfocar")
 
 
 @patch("app.services.procesarImage_services.actualizar_procesamiento")
@@ -233,7 +233,7 @@ def test_se_registra_procesamiento(mock_imagen,mock_algoritmo,mock_crear,mock_pr
     procesador.procesar.return_value = ("uploads/resultado.jpg")
     mock_procesador.return_value = procesador
 
-    procesar_imagen_service(1,"enfocar")
+    procesar_imagen(1,"enfocar")
 
     mock_crear.assert_called_once_with(id_imagen=1,id_algoritmo=1,estado="procesando")
 
@@ -248,7 +248,7 @@ def test_procesar_algoritmo_vacio(mock_imagen,mock_algoritmo):
     mock_algoritmo.return_value = None
 
     with pytest.raises(Exception) as exc:
-        procesar_imagen_service(1,"")
+        procesar_imagen(1,"")
 
     assert str(exc.value) == ("Algoritmo no encontrado")
 
@@ -273,7 +273,7 @@ def test_procesamiento_fallido_actualiza_estado_error(mock_imagen,mock_algoritmo
     mock_procesador.return_value = procesador
 
     with pytest.raises(Exception) as exc:
-        procesar_imagen_service(1,"enfocar")
+        procesar_imagen(1,"enfocar")
 
     assert str(exc.value) == ("Error interno")
 
